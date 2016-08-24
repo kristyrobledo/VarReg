@@ -5,7 +5,7 @@
 \title{Linear mean and variance regression}
 \usage{
 linVarReg(dat, var.ind = c(2), mean.ind = c(2), para.space = c("all",
-  "positive", "negative"), eps = 1e-06, maxit = 1000)
+  "positive", "negative"), control = list(...), ...)
 }
 \arguments{
 \item{dat}{Dataframe containing outcome and covariate data. Outcome data must be in the first column. Covariates for mean and variance model in next columns.}
@@ -16,12 +16,10 @@ linVarReg(dat, var.ind = c(2), mean.ind = c(2), para.space = c("all",
 
 \item{para.space}{Parameter space to search for variance parameter estimates. "positive" means only search positive parameter space, "negative" means search only negative parameter space and "all" means search all.}
 
-\item{eps}{Very small number for the convergence criteria, default 1 times 10 power6}
-
-\item{maxit}{Number of maximum iterations for the EM algorithm, default 1000.}
+\item{control}{list of control parameters. See \code{\link{VarReg.control}}.}
 }
 \value{
-$linVarReg$ returns an object of class "VarReg" which inherits some components from the class "glm".
+\code{linVarReg} returns an object of class \code{"VarReg"} which inherits some components from the class \code{"glm"}.
 
 A list of the results from the algorithm, including conv, reldiff, information criterion and mean and variance estimates.
 }

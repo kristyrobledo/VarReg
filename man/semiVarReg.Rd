@@ -6,17 +6,17 @@
 \usage{
 semiVarReg(y, x, meanmodel = c("zero", "constant", "linear", "semi"),
   varmodel = c("constant", "linear", "semi"), knots.m = 2, knots.v = 2,
-  degree = 2, mono.var = c("none", "inc", "dec"), eps = 1e-06,
-  maxit = 1000)
+  degree = 2, mono.var = c("none", "inc", "dec"), control = list(...),
+  ...)
 }
 \arguments{
 \item{y}{Vector containing outcome data. Must be no missing data.}
 
 \item{x}{Vector containing the covariate data. Must be no missing data.}
 
-\item{meanmodel}{Specify the mean model to be fit: "zero" =zero mean model, "constant" = constant mean, "linear" = linear term with x covariate, "semi" = semiparametric spline (specify with $knots.m$)}
+\item{meanmodel}{Specify the mean model to be fit: "zero" =zero mean model, "constant" = constant mean, "linear" = linear term with x covariate, "semi" = semiparametric spline (specify with \code{knots.m}).}
 
-\item{varmodel}{Specify the variance model to be fit: "constant" = constant variance model, "linear" = linear term with x covariate, "semi" = semiparametric spline (specify with $knots.v$)}
+\item{varmodel}{Specify the variance model to be fit: "constant" = constant variance model, "linear" = linear term with x covariate, "semi" = semiparametric spline (specify with \code{knots.v})}
 
 \item{knots.m}{A integer indicating the number of internal knots to be fit in the mean model. Default is '2'. (Note that the knots are placed equidistantly over x.)}
 
@@ -26,17 +26,15 @@ semiVarReg(y, x, meanmodel = c("zero", "constant", "linear", "semi"),
 
 \item{mono.var}{Indicates whether the variance model is monotonic (only applicable for 'linear' or 'semi' variance models). Default is 'none' (no monotonic constraints). Options are 'inc' for increasing or 'dec' for decreasing.}
 
-\item{eps}{Very small number for the convergence criteria, default 1 times 10 power6}
-
-\item{maxit}{Number of maximum iterations for the EM algorithm, default 1000.}
+\item{control}{list of control parameters. See \code{\link{VarReg.control}}.}
 }
 \value{
-$semiVarReg$ returns an object of class "VarReg" which inherits some components from the class "glm".
+\code{semiVarReg} returns an object of class "\code{VarReg}" which inherits some components from the class "\code{glm}".
 
-A list of the results from the algorithm, including conv, reldiff, information criterion and mean and variance estimates.
+Includes converge, reldiff, information criterion and mean and variance estimates.
 }
 \description{
-\code{semiVarReg} performs semiparametric mean and variance regression. At the moment, this is only designed for a single covariate that is fit in the mean and variance models.
+\code{semiVarReg} performs a semiparametric mean and variance regression model. Currently, this is only designed for a single covariate that is fit in the mean and variance models.
 }
 \examples{
 data(lidar)

@@ -2,22 +2,26 @@
 % Please edit documentation in R/seVarReg.R
 \name{seVarReg}
 \alias{seVarReg}
-\title{SE for mean and variance regression}
+\title{SE for mean and variance regression models}
 \usage{
-seVarReg(x, boot = FALSE, bootreps = 1000, eps = 1e-06, maxit = 1000)
+seVarReg(x, boot = FALSE, bootreps = 1000, control = list(...), ...)
 }
 \arguments{
-\item{x}{object of class VarReg to determin the SE (eg. model from semiVarReg)}
+\item{x}{object of class \code{"VarReg"} to determin the SE (eg. result from \code{\link{"semiVarReg"}}).}
 
 \item{boot}{TRUE or FALSE indicating if bootstrapped CI should be calculated. Default is FALSE.}
 
-\item{bootreps}{Number of bootstraps to be performed if $boot=TRUE$. Default is 1000.}
+\item{bootreps}{Number of bootstraps to be performed if \code{boot=TRUE}. Default is 1000.}
+
+\item{control}{List of control parameters for the bootstrapped models. See \code{\link{VarReg.control}}.}
 }
 \value{
-Table of results.
+List of results. \code{mean.est} and \code{variance.est} are tables of results from the mean model and variance model (as appropriate). They include the parameter estimates from the model, SEs from information matrix (if \code{boundary=FALSE}) and if specified, the se from bootstrapping with the bootstrapped 95\% CI. Additionally, the expected information matrices are given for the mean and the variance (\code{mean.im} and \code{variance.im}).
+
+Need to work on the inclusion of a vector of x values, spit out a vector of se for those specified x values.
 }
 \description{
-\code{seVarReg} calculates SE for an object from a linVarReg. If the result is not on a boundary, the Fishers Information matrix SE are given. The bootstrapped 95% CI can also be calculated.
+\code{seVarReg} calculates SE for an object of class \code{"VarReg"}. If the result is not on a boundary, the Fishers Information matrix SE are given. The bootstrapped 95\% CI can also be calculated.
 }
 \examples{
 data(lidar)

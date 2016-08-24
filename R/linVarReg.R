@@ -5,9 +5,8 @@
 #' @param var.ind Vector containing the column numbers of the data in 'dat' to be fit as covariates in the variance model. FALSE indicates constant variance option.
 #' @param mean.ind Vector containing the column numbers of the data in 'dat' to be fit as covariates in the mean model. 0 indicates constant mean option. NULL indicates zero mean option.
 #' @param para.space Parameter space to search for variance parameter estimates. "positive" means only search positive parameter space, "negative" means search only negative parameter space and "all" means search all.
-#' @param maxit Number of maximum iterations for the EM algorithm, default 1000.
-#' @param eps Very small number for the convergence criteria, default 1 times 10 power6
-#' @return $linVarReg$ returns an object of class "VarReg" which inherits some components from the class "glm".
+#' @param control list of control parameters. See \code{\link{VarReg.control}}.
+#' @return \code{linVarReg} returns an object of class \code{"VarReg"} which inherits some components from the class \code{"glm"}.
 #'
 #' A list of the results from the algorithm, including conv, reldiff, information criterion and mean and variance estimates.
 #'@examples
@@ -22,8 +21,9 @@
 #'@export
 
 
-linVarReg<-function(dat, var.ind=c(2), mean.ind=c(2), para.space=c("all", "positive", "negative"), eps=1e-6, maxit=1000){
+linVarReg<-function(dat, var.ind=c(2), mean.ind=c(2), para.space=c("all", "positive", "negative"), control=list(...), ...){
   para.space<-match.arg(para.space)
+  control<-do.call(VarReg.control, control)
   loops<-list()
   ll<-vector()
    X<-dat[,1]
@@ -39,11 +39,11 @@ linVarReg<-function(dat, var.ind=c(2), mean.ind=c(2), para.space=c("all", "posit
 
   ### constant variance first
   if (var.ind[1]==FALSE){
-    loops[[1]]<-loop_em(meanmodel, theta.old=1, p.old=rep(1, n), x.0=NULL, X, maxit, eps)
+    loops[[1]]<-loop_em(meanmodel, theta.old=1, p.old=rep(1, n), x.0=NULL, X, control$maxit, control$eps)
     var<- rep(loops[[1]]$theta.new, n)
     ll<- -n/2*log(2*pi)-1/2*sum(log(var))-sum(((X-loops[[1]]$fitted)**2)/(2*(var)))
     if (loops[[1]]$conv==FALSE){
-      writeLines(paste("Warning: Did not converge at Maxit=", maxit))
+      writeLines(paste("Warning: Did not converge at Maxit=", control$maxit))
     }
 
   ##variance model option
@@ -77,11 +77,11 @@ linVarReg<-function(dat, var.ind=c(2), mean.ind=c(2), para.space=c("all", "posit
           p.old<-p.old+(theta.old[j]*x.0[,j])
         }
       }
-      loops[[i]]<-loop_em(meanmodel, theta.old, p.old, x.0, X, maxit, eps)
+      loops[[i]]<-loop_em(meanmodel, theta.old, p.old, x.0, X, control$maxit, control$eps)
 
       ll[i]<- -n/2*log(2*pi)-1/2*sum(log(loops[[i]]$p.old))-sum(((X-loops[[i]]$fittedmean)**2)/(2*(loops[[i]]$p.old)))
       if (loops[[i]]$conv==FALSE){
-        writeLines(paste("Warning: Did not converge at maxit=", maxit))
+        writeLines(paste("Warning: Did not converge at maxit=", control$maxit))
       }
     }
   }
@@ -122,7 +122,7 @@ linVarReg<-function(dat, var.ind=c(2), mean.ind=c(2), para.space=c("all", "posit
     param<-length(mean.ind)+1+length(totalx)+1
   }
 
-  if (sum(as.integer(loops[[max.ll]]$p.old < eps))>0){
+  if (sum(as.integer(loops[[max.ll]]$p.old < control$bound.tol))>0){
     boundary=TRUE
   }else{
     boundary=FALSE

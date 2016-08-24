@@ -2,20 +2,20 @@
 % Please edit documentation in R/searchVarReg.R
 \name{searchVarReg}
 \alias{searchVarReg}
-\title{Searches for best semi parametric mean and variance regression}
+\title{Searches for best semi parametric mean and variance regression model}
 \usage{
 searchVarReg(y, x, maxknots.m = 3, maxknots.v = 3, degree = 2,
   mono.var = c("none", "inc", "dec"), selection = c("AIC", "AICc", "HQC",
-  "BIC"), eps = 1e-06, maxit = 1000)
+  "BIC"), control = list(...), ...)
 }
 \arguments{
 \item{y}{Vector containing outcome data. Must be no missing data.}
 
 \item{x}{Vector containing the covariate data. Must be no missing data.}
 
-\item{maxknots.m}{A integer indicating the maximum number of internal knots to be fit in the mean model. Default is '5'. (Note that the knots are placed equidistantly over x.)}
+\item{maxknots.m}{A integer indicating the maximum number of internal knots to be fit in the mean model. Default is '3'. (Note that the knots are placed equidistantly over x.)}
 
-\item{maxknots.v}{A integer indicating the maximum number of internal knots to be fit in the variance model. Default is '5'. (Note that the knots are placed equidistantly over x.)}
+\item{maxknots.v}{A integer indicating the maximum number of internal knots to be fit in the variance model. Default is '3'. (Note that the knots are placed equidistantly over x.)}
 
 \item{degree}{The degree of the splines fit in the mean and variance. Default is '2'.}
 
@@ -23,18 +23,19 @@ searchVarReg(y, x, maxknots.m = 3, maxknots.v = 3, degree = 2,
 
 \item{selection}{Indicates which information criteria is to be used for the selection of the best model. Choices are 'AIC', 'AICc', 'HQC', 'BIC'.}
 
-\item{eps}{Very small number for the convergence criteria, default 1 times 10 power6}
-
-\item{maxit}{Number of maximum iterations for the EM algorithm, default 1000.}
+\item{control}{list of control parameters. See \code{\link{VarReg.control}}.}
 }
 \value{
-$searchVarReg$ returns an list, where one of the components $best.model$ is of class "VarReg" which inherits some components from the class "glm". The list also contains the matrix of AIC, AICc, BIC and HQC from all of the models fit to the data.
+\code{searchVarReg} returns an list, where one of the components \code{best.model} is of class \code{"VarReg"} which inherits some components from the class \code{"glm"}. The list also contains the matrix of AIC, AICc, BIC and HQC from all of the models fit to the data.
 }
 \description{
-\code{searchVarReg} performs multiple semiparametric mean and variance regression models for a covariate of interest. The best model is chosen based on the information criterion of preference. At the moment, this is only designed for a single covariate that is fit in the mean and variance models.
+\code{searchVarReg} performs multiple semiparametric mean and variance regression models for a covariate of interest. The best model is chosen based on the information criterion of preference (\code{"selection"}). At the moment, this is only designed for a single covariate that is fit in both the mean and variance models.
+}
+\details{
+A matrix of models are performed, of increasing complexity. Mean models start at a zero mean model, then constant mean, linear, 0 internal knots, etc, up to a maximum internal knots as specified in \code{maxknots.m}. Variance models start at constant variance, linear variance, 0 internal knots, etc, up to max internal knots as specified in \code{maxknots.v}.
 }
 \examples{
 data(lidar)
-find<-searchVarReg(lidar$logratio, lidar$range, maxknots.v=3, maxknots.m=3, mono.var="none", selection="HQC", maxit=100)
+find<-searchVarReg(lidar$logratio, lidar$range, maxknots.v=3, maxknots.m=3, selection="HQC", maxit=100)
 }
 

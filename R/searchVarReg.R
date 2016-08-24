@@ -1,25 +1,24 @@
-#' Searches for best semi parametric mean and variance regression
+#' Searches for best semi parametric mean and variance regression model
 #'
-#' \code{searchVarReg} performs multiple semiparametric mean and variance regression models for a covariate of interest. The best model is chosen based on the information criterion of preference. At the moment, this is only designed for a single covariate that is fit in the mean and variance models.
+#' \code{searchVarReg} performs multiple semiparametric mean and variance regression models for a covariate of interest. The best model is chosen based on the information criterion of preference (\code{"selection"}). At the moment, this is only designed for a single covariate that is fit in both the mean and variance models.
 #' @param y Vector containing outcome data. Must be no missing data.
 #' @param x Vector containing the covariate data. Must be no missing data.
-#' @param maxknots.m  A integer indicating the maximum number of internal knots to be fit in the mean model. Default is '5'. (Note that the knots are placed equidistantly over x.)
-#' @param maxknots.v A integer indicating the maximum number of internal knots to be fit in the variance model. Default is '5'. (Note that the knots are placed equidistantly over x.)
+#' @param maxknots.m  A integer indicating the maximum number of internal knots to be fit in the mean model. Default is '3'. (Note that the knots are placed equidistantly over x.)
+#' @param maxknots.v A integer indicating the maximum number of internal knots to be fit in the variance model. Default is '3'. (Note that the knots are placed equidistantly over x.)
 #' @param degree The degree of the splines fit in the mean and variance. Default is '2'.
 #' @param mono.var Indicates whether the variance model is monotonic (only applied to 'linear' or splines variance models). Default is 'none' (no monotonic constraints). Options are 'inc' for increasing or 'dec' for decreasing.
 #' @param selection Indicates which information criteria is to be used for the selection of the best model. Choices are 'AIC', 'AICc', 'HQC', 'BIC'.
-#' @param maxit Number of maximum iterations for the EM algorithm, default 1000.
-#' @param eps Very small number for the convergence criteria, default 1 times 10 power6
-#' @return $searchVarReg$ returns an list, where one of the components $best.model$ is of class "VarReg" which inherits some components from the class "glm". The list also contains the matrix of AIC, AICc, BIC and HQC from all of the models fit to the data.
-#'
+#' @param control  list of control parameters. See \code{\link{VarReg.control}}.
+#' @return \code{searchVarReg} returns an list, where one of the components \code{best.model} is of class \code{"VarReg"} which inherits some components from the class \code{"glm"}. The list also contains the matrix of AIC, AICc, BIC and HQC from all of the models fit to the data.
+#'@details A matrix of models are performed, of increasing complexity. Mean models start at a zero mean model, then constant mean, linear, 0 internal knots, etc, up to a maximum internal knots as specified in \code{maxknots.m}. Variance models start at constant variance, linear variance, 0 internal knots, etc, up to max internal knots as specified in \code{maxknots.v}.
 
 #'@examples
 #'data(lidar)
-#'find<-searchVarReg(lidar$logratio, lidar$range, maxknots.v=3, maxknots.m=3, mono.var="none", selection="HQC", maxit=100)
+#'find<-searchVarReg(lidar$logratio, lidar$range, maxknots.v=3, maxknots.m=3, selection="HQC", maxit=100)
 
 #'@export
 
-searchVarReg<-function(y,x, maxknots.m=3, maxknots.v=3, degree=2, mono.var=c("none", "inc", "dec"), selection=c("AIC", "AICc", "HQC", "BIC"), eps=1e-6, maxit=1000){
+searchVarReg<-function(y,x, maxknots.m=3, maxknots.v=3, degree=2, mono.var=c("none", "inc", "dec"), selection=c("AIC", "AICc", "HQC", "BIC"), control=list(...), ...){
   selection<-match.arg(selection)
   if (length(y)!=length(x)){
     stop("Error: x and y not same length")
@@ -27,6 +26,7 @@ searchVarReg<-function(y,x, maxknots.m=3, maxknots.v=3, degree=2, mono.var=c("no
   if (length(maxknots.m)>1 || length(maxknots.v)>1){
     stop("Error: maxknots.m or maxknots.v greater than length 1")
   }
+  control<-do.call(VarReg.control, control)
   n<-length(y)
   m<-list()
   col.n<-paste("Mean", c("zero", "constant", "linear", paste("Knot",seq(0,maxknots.m), sep="")), sep="_")
@@ -66,7 +66,7 @@ searchVarReg<-function(y,x, maxknots.m=3, maxknots.v=3, degree=2, mono.var=c("no
       param<-i-1+j
       #print(paste("parameters", param))
       log <- capture.output({
-      m[[rep]]<-semiVarReg(y=y,x=x, meanmodel=meanmodel, varmodel=varmodel,knots.m=knots.m, knots.v=knots.v,degree=degree, mono.var = mono.var, maxit=maxit,eps=eps)
+      m[[rep]]<-semiVarReg(y=y,x=x, meanmodel=meanmodel, varmodel=varmodel,knots.m=knots.m, knots.v=knots.v,degree=degree, mono.var = mono.var, control=control)
       })
       m[[rep]]$pos<-c(j,i)
       ll[j,i]<-m[[rep]]$loglik
