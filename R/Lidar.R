@@ -1,0 +1,23 @@
+#' LIDAR dataset.
+#'
+#' A dataset containing 221 observations from a light detection and ranging (LIDAR)
+#' experiment.
+#'
+#' @format A data frame with 221 rows and 2 variables:
+#' \describe{
+#'   \item{range}{distance travelled before the light is reflected back to its source}
+#'   \item{logratio}{logarithm of the ratio of recieved light from two laser sources}
+#'   ...
+#' }
+#' @source Sigrist, M. (Ed.) (1994). Air Monitoring by Spectroscopic Techniques (Chemical Analysis Series,
+#' vol. 197). New York: Wiley.
+#'
+#' @references Ruppert, D., Wand, M.P. and Carroll, R.J. (2003)
+#'Semiparametric Regression Cambridge University Press
+#'\url{http://www.stat.tamu.edu/~carroll/semiregbook/}
+#'@examples
+#'library(varreg)
+#'data(lidar)
+#'attach(lidar)
+#'plot(range,logratio)
+"lidar"

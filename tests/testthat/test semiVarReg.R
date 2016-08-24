@@ -1,0 +1,48 @@
+library(VarReg)
+context("checking semiVarReg and seVarReg functions")
+data(lidar)
+test_that("Checking linear mean & variance model", {
+  linmodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="linear", varmodel="linear")
+  expect_equal_to_reference(linmodel, "SemiModel1.rds")
+  linse<-seVarReg(linmodel, boot=TRUE, bootreps=10)
+  linse2<-seVarReg(linmodel, boot=FALSE)
+  expect_equal_to_reference(linse, "se1.rds")
+  expect_equal_to_reference(linse2, "se2.rds")
+})
+test_that("Checking con mean model", {
+  conmeanmodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="constant", varmodel="semi", knots.v=2)
+  expect_equal_to_reference(conmeanmodel, "SemiModel2.rds")
+  conmeanse<-seVarReg(conmeanmodel, boot=TRUE, bootreps=5)
+  expect_equal_to_reference(conmeanse, "se3.rds")
+})
+test_that("Checking zero mean model", {
+  zeromeanmodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="zero", varmodel="semi", knots.v=2)
+  expect_equal_to_reference(zeromeanmodel, "SemiModel3.rds")
+  zeromeanse<-seVarReg(zeromeanmodel, boot=TRUE, bootreps=5)
+  expect_equal_to_reference(zeromeanse, "se4.rds")
+})
+test_that("Checking knots in both  model", {
+  semimodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="semi", varmodel="semi", knots.m=3, knots.v=2)
+  expect_equal_to_reference(semimodel, "SemiModel4.rds")
+  semise<-seVarReg(semimodel, boot=TRUE, bootreps=5)
+  expect_equal_to_reference(semise, "se4.rds")
+})
+test_that("Checking con var  model", {
+  convarmodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="semi", varmodel="constant", knots.m=3, knots.v=2)
+  expect_equal_to_reference(convarmodel, "SemiModel5.rds")
+  convarse<-seVarReg(convarmodel, boot=TRUE, bootreps=5)
+  expect_equal_to_reference(convarse, "se5.rds")
+})
+test_that("Checking monotonic variance=inc", {
+  inc<-semiVarReg(lidar$logratio, lidar$range, meanmodel="semi", varmodel="semi", knots.m=3, knots.v=2, mono.var="inc")
+  expect_equal_to_reference(inc, "SemiModel6.rds")
+  incse<-seVarReg(inc, boot=TRUE, bootreps=5)
+  expect_equal_to_reference(convarse, "se6.rds")
+})
+test_that("Checking monotonic variance=dec", {
+  dec<-semiVarReg(lidar$logratio, lidar$range, meanmodel="semi", varmodel="semi", knots.m=3, knots.v=2, mono.var="dec")
+  expect_equal_to_reference(dec, "SemiModel7.rds")
+  decse<-seVarReg(dec, boot=TRUE, bootreps=5)
+  expect_equal_to_reference(convarse, "se7.rds")
+
+})
