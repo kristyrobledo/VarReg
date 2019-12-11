@@ -5,6 +5,11 @@
 
 <!-- badges: start -->
 
+[![](https://www.r-pkg.org/badges/version/VarReg?color=orange)](https://cran.r-project.org/package=VarReg)
+[![](https://img.shields.io/badge/devel%20version-1.0.2-blue.svg)](https://github.com/kristyrobledo/VarReg)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/VarReg?color=blue)](https://cran.r-project.org/package=VarReg)
+[![](http://cranlogs.r-pkg.org/badges/last-month/VarReg?color=green)](https://cran.r-project.org/package=VarReg)
+[![](http://cranlogs.r-pkg.org/badges/last-week/VarReg?color=yellow)](https://cran.r-project.org/package=VarReg)
 <!-- badges: end -->
 
 The goal of VarReg is to provide methods for fitting semi-parametric
@@ -14,7 +19,16 @@ parameters. This algorithm is based upon an EM (Expectation
 Maximisation) algorithm, so is more stable than other similar methods
 like GAMLSS.
 
-## Installation
+## :raising\_hand: Author
+
+Kristy Robledo <https://github.com/kristyrobledo>
+
+NHMRC Clinical Trials Centre, University of Sydney
+
+\[\[alt text\]\[1.1\]\]\[1\] \[1.1\]: <http://i.imgur.com/tXSoThF.png>
+\[1\]: <http://www.twitter.com/redheadkristy>
+
+## :arrow\_double\_down: Installation
 
 You can install the released version of VarReg from
 [CRAN](https://CRAN.R-project.org) with:
@@ -30,7 +44,7 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("kristyrobledo/VarReg")
 ```
 
-## Example
+## :book: Examples
 
 This is a basic example to read in the mcycle dataset and perform a
 linear model in the mean and the variance:

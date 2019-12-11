@@ -11,17 +11,34 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+library(badger)
 ```
 
 # VarReg
 
 <!-- badges: start -->
+`r badge_cran_release("VarReg", "orange")` 
+`r badge_devel("kristyrobledo/VarReg", "blue")`
+`r badge_cran_download("VarReg", "grand-total", "blue")`
+`r badge_cran_download("VarReg", "last-month", "green")`
+`r badge_cran_download("VarReg", "last-week", "yellow")`
 <!-- badges: end -->
 
 The goal of VarReg is to provide methods for fitting semi-parametric mean and variance models, with normal or censored data. This has also been extended to allow a regression in the location, scale and shape parameters.
 This algorithm is based upon an EM (Expectation Maximisation) algorithm, so is more stable than other similar methods like GAMLSS.
 
-## Installation
+## :raising_hand: Author
+
+Kristy Robledo <https://github.com/kristyrobledo>
+
+NHMRC Clinical Trials Centre, University of Sydney
+
+[![alt text][1.1]][1]
+[1.1]: http://i.imgur.com/tXSoThF.png
+[1]: http://www.twitter.com/redheadkristy
+
+
+## :arrow_double_down: Installation
 
 You can install the released version of VarReg from [CRAN](https://CRAN.R-project.org) with:
 
@@ -35,7 +52,7 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("kristyrobledo/VarReg")
 ```
-## Example
+## :book: Examples
 
 This is a basic example to read in the mcycle dataset and perform a linear model in the mean and the variance:
 
