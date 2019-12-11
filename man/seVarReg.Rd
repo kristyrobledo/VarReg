@@ -2,33 +2,69 @@
 % Please edit documentation in R/seVarReg.R
 \name{seVarReg}
 \alias{seVarReg}
-\title{SE for mean and variance regression models}
+\title{SE calculations for mean and variance regression models}
 \usage{
-seVarReg(x, boot = FALSE, bootreps = 1000, control = list(...), ...)
+seVarReg(x, boot = FALSE, bootreps = 1000, vector.mean = x$data[, 2],
+  vector.variance = x$data[, 2], control = list(...), ...)
 }
 \arguments{
-\item{x}{object of class \code{"VarReg"} to determin the SE (eg. result from \code{\link{"semiVarReg"}}).}
+\item{x}{Object of class \code{VarReg} to determin the SE (eg. result from \code{\link{semiVarReg}}).}
 
-\item{boot}{TRUE or FALSE indicating if bootstrapped CI should be calculated. Default is FALSE.}
+\item{boot}{Logical to indicate if bootstrapped CI should be calculated. Default is \code{FALSE}.}
 
-\item{bootreps}{Number of bootstraps to be performed if \code{boot=TRUE}. Default is 1000.}
+\item{bootreps}{Number of bootstraps to be performed if \code{boot=TRUE}. Default is \code{1000}.}
 
-\item{control}{List of control parameters for the bootstrapped models. See \code{\link{VarReg.control}}.}
+\item{vector.mean}{Vector of \code{x} values for which the SE of the mean is to be calculated.
+Default is the \code{x} covariate from the model.}
+
+\item{vector.variance}{Vector of \code{x} values for which the SE of the variance is to be calculated.
+Default is the actual \code{x} covariate from the model.}
+
+\item{control}{List of control parameters for the bootstrapped models.
+See \code{\link{VarReg.control}}.}
+
+\item{...}{arguments to be used to form the default control argument if it is not supplied
+directly}
 }
 \value{
-List of results. \code{mean.est} and \code{variance.est} are tables of results from the mean model and variance model (as appropriate). They include the parameter estimates from the model, SEs from information matrix (if \code{boundary=FALSE}) and if specified, the se from bootstrapping with the bootstrapped 95\% CI. Additionally, the expected information matrices are given for the mean and the variance (\code{mean.im} and \code{variance.im}).
-
-Need to work on the inclusion of a vector of x values, spit out a vector of se for those specified x values.
+The result is a list of results. This includes:
+\itemize{
+\item \code{mean.est}: dataframe of overall results from the mean model, including parameter estimates
+from the model, SEs from information matrix (if \code{boundary=FALSE}) and if specified, the SE
+from bootstrapping with the bootstrapped 95\% CI.
+\item \code{variance.est}: dataframe of overall results from the variance model, including parameter
+ estimates from the model, SEs from information matrix (if \code{boundary=FALSE}) and if specified,
+ the SE from bootstrapping with the bootstrapped 95\% CI.
+\item \code{mean.im}: dataframe of the expected information matrices for the mean (as appropriate)
+\item \code{variance.im}: dataframe of the expected information matrices for the variance
+(as appropriate)
+\item \code{mean.outputs}: dataframe with complete output for mean graphics. Includes the
+\code{vector.mean} as input, and the mean vector (\code{mean.mean}) and the SE vector
+\code{mean.se.im}, and bootstrapping outputs as appropriate.
+\item \code{variance.outputs}: dataframe with complete output for variance graphics. Includes the
+\code{vector.variance} as input, and the mean vector (\code{var.mean}) and the SE vector
+\code{var.se.im}, and bootstrapping outputs as appropriate.
+}
 }
 \description{
-\code{seVarReg} calculates SE for an object of class \code{"VarReg"}. If the result is not on a boundary, the Fishers Information matrix SE are given. The bootstrapped 95\% CI can also be calculated.
+\code{seVarReg} calculates SE for an object of class \code{VarReg}. If the result is not on a
+boundary, the Fishers Information matrix SE are given. The bootstrapped 95\% CI can also be
+calculated. Designed to be called by the plot function \code{plotVarReg}, rather than run by a user.
 }
 \examples{
-data(lidar)
-lid<-data.frame(lidar$logratio, lidar$range)
+data(mcycle)
 ##Fit model with range as a covariate in the mean and the variance model
-semimodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="semi", varmodel="semi", knots.m=4, knots.v=2)
+semimodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="linear",
+knots.m=4, maxit=10000)
 ##Calculate SE
-se<-seVarReg(semimodel, boot=TRUE, bootreps=10)
+se1<-seVarReg(semimodel, boot=FALSE)
+##not run: with bootstrapping
+##se2<-seVarReg(semimodel, boot=TRUE, bootreps=10)
+##not run: calculate mean and SE for a given sequence
+##test.seq<-seq(min(mcycle$times), max(mcycle$times),
+##by=((max(mcycle$times)-min(mcycle$times))/999))
+##se2<-seVarReg(semimodel, boot=TRUE, bootreps=10, vector.mean=test.seq)
 }
-
+\seealso{
+\code{\link{semiVarReg}}, \code{\link{VarReg.control}}
+}

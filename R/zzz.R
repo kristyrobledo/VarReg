@@ -9,7 +9,7 @@
     varreg.install.args = "",
     varreg.name = "Kristy Robledo",
     varreg.desc.author = '"Kristy Robledo <robledo.kristy@gmail.com> [aut, cre]"',
-    varreg.desc.license = "What license is it under?",
+    varreg.desc.license = "GPL (>= 2)",
     varreg.desc.suggests = NULL,
     varreg.desc = list()
   )

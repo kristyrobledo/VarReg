@@ -4,38 +4,80 @@
 \alias{searchVarReg}
 \title{Searches for best semi parametric mean and variance regression model}
 \usage{
-searchVarReg(y, x, maxknots.m = 3, maxknots.v = 3, degree = 2,
-  mono.var = c("none", "inc", "dec"), selection = c("AIC", "AICc", "HQC",
-  "BIC"), control = list(...), ...)
+searchVarReg(y, x, cens.ind = NULL, maxknots.m = 3, maxknots.v = 3,
+  degree = 2, mono.var = c("none", "inc", "dec"), selection = c("AIC",
+  "AICc", "HQC", "BIC"), print.it = FALSE, control = list(...), ...)
 }
 \arguments{
-\item{y}{Vector containing outcome data. Must be no missing data.}
+\item{y}{Vector containing outcome data. Must be no missing data and any censored values must
+be set to the limits of detection.}
 
-\item{x}{Vector containing the covariate data. Must be no missing data.}
+\item{x}{Vector containing the covariate data. Must be no missing data and same length as \code{y}.}
 
-\item{maxknots.m}{A integer indicating the maximum number of internal knots to be fit in the mean model. Default is '3'. (Note that the knots are placed equidistantly over x.)}
+\item{cens.ind}{Vector containing the censoring indicator, if applicable. There must be no missing
+data contained in the vector and this vector should be the same length as \code{y}.
+\code{"0"} values indicate uncensored data, \code{"1"} indicates right, or upper, censoring and
+\code{"-1"} indicates left, or lower, censoring. The default is \code{NULL} which indicates there
+is no censored data.}
 
-\item{maxknots.v}{A integer indicating the maximum number of internal knots to be fit in the variance model. Default is '3'. (Note that the knots are placed equidistantly over x.)}
+\item{maxknots.m}{Integer indicating the maximum number of internal knots to be fit in the mean model. Default is \code{3}. (Note that the knots are placed equidistantly over x.)}
 
-\item{degree}{The degree of the splines fit in the mean and variance. Default is '2'.}
+\item{maxknots.v}{Integer indicating the maximum number of internal knots to be fit in the variance model. Default is \code{3}. (Note that the knots are placed equidistantly over x.)}
 
-\item{mono.var}{Indicates whether the variance model is monotonic (only applied to 'linear' or splines variance models). Default is 'none' (no monotonic constraints). Options are 'inc' for increasing or 'dec' for decreasing.}
+\item{degree}{The degree of the splines fit in the mean and variance. Default is \code{2}.}
 
-\item{selection}{Indicates which information criteria is to be used for the selection of the best model. Choices are 'AIC', 'AICc', 'HQC', 'BIC'.}
+\item{mono.var}{Text to indicate whether the variance model is monotonic (only applied to 'linear' or
+semi-parametric variance models). Default is "\code{none}" (no monotonic constraints). Options are
+"\code{inc}" for increasing or "\code{dec}" for decreasing. If the variance model is linear, the
+parameter space is constrained (positive for increasing and negative for decreasing). For
+semi-parametric variance models, the appropriate monotonic B splines are fit in the
+semi-parametric variance model.}
+
+\item{selection}{Text to indicate which information criteria is to be used for the selection of the
+ best model. Choices are "\code{AIC}", "\code{AICc}", "\code{BIC}" and "\code{HQC}".
+Default is "\code{AIC}".}
+
+\item{print.it}{Logical to indicate whether to print progress from each model as the models are
+performed. Default is \code{FALSE}.}
 
 \item{control}{list of control parameters. See \code{\link{VarReg.control}}.}
+
+\item{...}{arguments to be used to form the default control argument if it is not supplied
+directly}
 }
 \value{
-\code{searchVarReg} returns an list, where one of the components \code{best.model} is of class \code{"VarReg"} which inherits some components from the class \code{"glm"}. The list also contains the matrix of AIC, AICc, BIC and HQC from all of the models fit to the data.
+\code{searchVarReg} returns an list, with the following components:
+\itemize{
+\item \code{ll}: a dataframe of the log-likelihoods from each of the models that have been fit.
+\item \code{AIC}: a dataframe of the AIC from each of the models that have been fit. The parameters
+ fit in the mean model are given in the columns, and the parameters in the variance are given
+ in the rows.
+ \item \code{AICc}: a dataframe of the AIC-c from each of the models that have been fit.
+ \item \code{BIC}: a dataframe of the BIC from each of the models that have been fit.
+ \item \code{HQC}: a dataframe of the HQC from each of the models that have been fit.
+ \item \code{best.model}: an object of class \code{VarReg} (see \code{\link{semiVarReg}})
+ containing the output from the optimal model (that model within the specified models in
+ the mean and variance with the lowest information criterion according to the criterion selected).
+}
 }
 \description{
-\code{searchVarReg} performs multiple semiparametric mean and variance regression models for a covariate of interest. The best model is chosen based on the information criterion of preference (\code{"selection"}). At the moment, this is only designed for a single covariate that is fit in both the mean and variance models.
+\code{searchVarReg} performs multiple semi-parametric mean and variance regression models for a covariate of interest, in order to search for the optimal number of knots. The best model is chosen based on the information criterion of preference (\code{"selection"}). At the moment, this is only designed for a single covariate that is fit in both the mean and variance models.
 }
 \details{
-A matrix of models are performed, of increasing complexity. Mean models start at a zero mean model, then constant mean, linear, 0 internal knots, etc, up to a maximum internal knots as specified in \code{maxknots.m}. Variance models start at constant variance, linear variance, 0 internal knots, etc, up to max internal knots as specified in \code{maxknots.v}.
+A matrix of models are performed, of increasing complexity. Mean models start at a zero mean
+model, then constant mean, linear, 0 internal knots, etc, up to a maximum internal knots as specified
+ in \code{maxknots.m}. Variance models start at constant variance, linear variance, 0 internal knots,
+  etc, up to max internal knots as specified in \code{maxknots.v}.
+
+Note that this function can take some time to run, due to the number of models to be fit.
+A window will appear on windows based systems to show a progress bar for the function.
 }
 \examples{
-data(lidar)
-find<-searchVarReg(lidar$logratio, lidar$range, maxknots.v=3, maxknots.m=3, selection="HQC", maxit=100)
+data(mcycle)
+### not run
+### find<-searchVarReg(mcycle$accel, mcycle$times, maxknots.v=3, maxknots.m=3,
+### selection="HQC", maxit=10000)
 }
-
+\seealso{
+\code{\link{semiVarReg}}, \code{\link{VarReg.control}}
+}

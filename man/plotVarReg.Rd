@@ -4,25 +4,68 @@
 \alias{plotVarReg}
 \title{Plots graphics for a mean and variance regression model}
 \usage{
-plotVarReg(x, knot.lines = FALSE, CI = FALSE, ci.type = c("im", "boot"),
-  xlab = "x", ylab = "y")
+plotVarReg(x, knot.lines = FALSE, ci = FALSE, ci.type = c("im", "boot"),
+  bootreps = 1000, xlab = "x", ylab = "y", control = list(...), ...)
 }
 \arguments{
-\item{x}{Object of class VarReg.}
+\item{x}{Object of class \code{VarReg} (see \code{\link{semiVarReg}}).}
 
-\item{knot.lines}{TRUE/FALSE (Default=TRUE) to show the knot lines on the graphics.}
+\item{knot.lines}{Logical to indicate if knot lines should be shown on graphics
+(if model is type "semi"). Default is \code{FALSE}}
 
-\item{CI}{TRUE/FALSE (Default=FALSE) to show the 95\% CI on the plots.}
+\item{ci}{Logical indicate if 95\% CI should be shown on the plots. Default is \code{FALSE}
+and \code{ci.type="im"}.}
+
+\item{ci.type}{Text to indicate the type of CI to plot. Either \code{"im"} (information matrix) or \code{"boot"} (bootstrapped). Default is \code{"im"}.}
+
+\item{bootreps}{Integer to indicate the number of bootstrap replications to be performed if \code{ci.type="boot"}. Default is \code{1000}.}
+
+\item{xlab}{Text for the label to be placed on the \code{x} axis of graphics (covariate)}
+
+\item{ylab}{Text for the label to be placed on the \code{y} axis of graphics (outcome)}
+
+\item{control}{list of control parameters to be used in bootstrapping.
+See \code{\link{VarReg.control}}.}
+
+\item{...}{arguments to be used to form the default control argument if it is not supplied
+directly}
 }
 \value{
-returns a series of graphics.
+This function returns a 2x2 plot, with slightly different plots given, depending on the outcome data. For uncensored data, the plots are:
+\itemize{
+\item the mean function over the \code{x}-variable, with or without 95\% CI,  and with or
+without the knot lines indicated
+\item the variance function over the \code{x}-variable, with or without 95\% CI and with or
+without the knot lines indicated
+\item a Q-Q plot of the residuals from the model
+\item a histogram of the residuals from the model
+}
+ If the outcome data is censored, the last two plots are no longer appropriate.
+ Given the censored residuals from the model, we can compare the squared standardised residuals
+ (given in black) with their censoring indicator to the chi-squared distribution with one
+ degree of freedom (given in red). This is one of the plots given for censored data, and the
+ other is a plot of the data, coloured by the censoring status. The triangles with the point at
+ the top are bottom censored and the triangles with the point at the bottom are top censored.
 }
 \description{
 \code{plotVarReg} to produce graphics for models fit in this package.
 }
 \examples{
-data(lidar)
-linmodel<-semiVarReg(lidar$logratio, lidar$range, meanmodel="linear", varmodel="linear")
-test<-plotVarReg(linmodel)
-}
+data(mcycle)
+linmodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="linear", varmodel="linear",
+maxit=10000)
+plotVarReg(linmodel)
+plotVarReg(linmodel, ci=TRUE, ci.type="im", ylab="Range", xlab="Time in seconds")
+##not run
+##plotVarReg(linmodel, ci=TRUE, ci.type="boot", bootreps=10,ylab="Acceleration",
+##xlab="Time in seconds")
 
+##not run
+##semimodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
+##knots.m=4, knots.v=2, maxit=10000)
+##plotVarReg(semimodel, ci=TRUE, ci.type="boot",bootreps=10,ylab="Acceleration",
+##xlab="Time in seconds", maxit=10000)
+}
+\seealso{
+\code{\link{semiVarReg}}, \code{\link{VarReg.control}}
+}

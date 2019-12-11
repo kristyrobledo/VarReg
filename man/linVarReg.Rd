@@ -2,7 +2,7 @@
 % Please edit documentation in R/linVarReg.R
 \name{linVarReg}
 \alias{linVarReg}
-\title{Linear mean and variance regression}
+\title{Linear mean and variance regression function}
 \usage{
 linVarReg(dat, var.ind = c(2), mean.ind = c(2), para.space = c("all",
   "positive", "negative"), control = list(...), ...)
@@ -16,24 +16,35 @@ linVarReg(dat, var.ind = c(2), mean.ind = c(2), para.space = c("all",
 
 \item{para.space}{Parameter space to search for variance parameter estimates. "positive" means only search positive parameter space, "negative" means search only negative parameter space and "all" means search all.}
 
-\item{control}{list of control parameters. See \code{\link{VarReg.control}}.}
+\item{control}{List of control parameters. See \code{\link{VarReg.control}}.}
+
+\item{...}{arguments to be used to form the default control argument if it is not supplied
+directly}
 }
 \value{
-\code{linVarReg} returns an object of class \code{"VarReg"} which inherits some components from the class \code{"glm"}.
-
-A list of the results from the algorithm, including conv, reldiff, information criterion and mean and variance estimates.
+\code{linVarReg} returns a list of output including:
+\itemize{
+\item\code{converged}: Logical argument indicating if convergence occurred.
+\item\code{iterations}: Total iterations performed of the EM algorithm.
+ \item\code{reldiff}: the positive convergence tolerance that occured at the final iteration.
+ \item\code{loglik}: Numeric variable of the maximised log-likelihood.
+ \item\code{boundary}: Logical argument indicating if estimates are on the boundary.
+ \item\code{aic.c}: Akaike information criterion corrected for small samples
+ \item\code{aic}: Akaike information criterion
+ \item\code{bic}: Bayesian information criterion
+ \item\code{hqc}: Hannan-Quinn information criterion
+ \item\code{mean.ind}: Vector of integer(s) indicating the column number(s) in the dataframe
+ \code{data} that were fit in the mean model.
+ \item\code{mean}: Vector of the maximum likelihood estimates of the mean parameters.
+ \item \code{var.ind}: Vector of integer(s) indicating the column(s) in the dataframe
+ \code{data} that were fit in the variance model.
+ \item\code{variance}: Vector of the maximum likelihood estimates of the variance parameters.
+ \item\code{cens.ind}: Integer indicating the column in the dataframe \code{data} that
+ corresponds to the censoring indicator. Always NULL.
+ \item\code{data}: Dataframe containing the variables included in the model.
+ }
 }
 \description{
-\code{linVarReg} performs multivariate mean and multivariate variance regression.
+\code{linVarReg} performs multivariate mean and multivariate variance regression. This function is
+ designed to be used by the  \code{\link{semiVarReg}} function.
 }
-\examples{
-data(lidar)
-lid<-data.frame(lidar$logratio, lidar$range)
-##Fit model with range as a covariate in the mean and the variance model
-linmodel<-linVarReg(dat=lidar, var.ind=c(2),mean.ind=c(2), para.space="all")
-##Give more iterations to converge
-linmodel<-linVarReg(dat=lidar, var.ind=c(2),mean.ind=c(2), maxit=10000, para.space="all")
-##Fit model with range as variate in variance model only - constant mean model.
-conmean<-linVarReg(dat=lidar, var.ind=c(2),mean.ind=0, para.space="all")
-}
-

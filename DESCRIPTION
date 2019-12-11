@@ -1,18 +1,20 @@
 Package: VarReg
 Type: Package
-Title: Semi parametric variance regression with models in both the mean and
-    variance
-Version: 0.0.0.9000
-Authors@R: person("Kristy", "Robledo", email = "robledo.kristy@gmail.com", role = c("aut", "cre"))
-Description: Allows for semi-parametric variance regression models in both the mean and variance.
-    One covariate for the mean and one for the variance and can have varying knots
-    specified in each. Also has a plot function.
+Title: Semi-Parametric Variance Regression
+Version: 1.0.2
+Authors@R: c(person("Kristy","Robledo", email = "robledo.kristy@gmail.com", role = c("aut", "cre")),person("Ian", "Marschner", role = c("ths")))
+Maintainer: Kristy Robledo <robledo.kristy@gmail.com>
+Description: Methods for fitting semi-parametric mean and variance models, with normal or censored data. Also extended to allow a regression in the location, scale and shape parameters.
 License: GPL-3
+Depends: R (>= 2.10)
 LazyData: TRUE
 Suggests:
-    NA,
     testthat
-VignetteBuilder:
 Imports:
-    splines
-RoxygenNote: 5.0.1
+    splines,
+    stats,
+    graphics,
+    sn,
+    survival,
+    utils
+RoxygenNote: 6.0.0

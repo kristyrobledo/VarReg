@@ -1,15 +1,25 @@
-#' The EM loop
+#' The EM loop for the main mean and variance function
 #'
-#' \code{loop_em} is a basic EM loop function to be utilised by various other higher level functions
+#' \code{loop_em} is a basic EM loop function to be utilised by various other higher level functions.
 #' @param meanmodel Dataframe containing only the covariates to be fit in the mean model. NULL for zero mean model and FALSE for constant mean model.
 #' @param theta.old Vector containing the initial variance parameter estimates to be fit in the variance model.
 #' @param p.old Vector of length n containing the containing the initial variance estimate.
 #' @param x.0 Matrix of covariates (length n) to be fit in the variance model. All have been rescaled so zero is the minimum. If NULL, then its a constant variance model.
 #' @param X Vector of length n of the outcome variable.
-#' @param maxit Number of maximum iterations for the EM algorithm, default 1000.
-#' @param eps Very small number for the convergence criteria, default 1 times 10 power6
-#' @return A list of the results from the EM algorithm, including conv, reldiff, it, mean, theta.new, fitted.
-#'
+#' @param maxit Number of maximum iterations for the EM algorithm.
+#' @param eps Very small number for the convergence criteria.
+#' @return A list of the results from the EM algorithm, including
+#' \itemize{
+#' \item\code{conv}: Logical argument indicating if convergence occurred
+#' \item\code{it}: Total iterations performed of the EM algorithm
+#'  \item\code{reldiff}: the positive convergence tolerance that occured at the final iteration.
+#'  \item\code{theta.new}: Vector of variance parameter estimates. Note that these are not yet
+#'  transformed back to the appropriate scale
+#'  \item\code{mean}: Vector of mean parameter estimates
+#'  \item\code{fittedmean}: Vector of fitted mean estimates
+#'  \item\code{p.old}: Vector of fitted variance estimates
+#'  }
+#'@export
 
 loop_em<-function(meanmodel, theta.old, p.old, x.0, X, maxit, eps){
   n<-length(X)
@@ -22,11 +32,11 @@ loop_em<-function(meanmodel, theta.old, p.old, x.0, X, maxit, eps){
     mean.fit<-rep(0,n)
     beta.old<-NULL
   }else if (is.data.frame(meanmodel)==TRUE){
-    l<-lm(X~., weight=1/p.old, data=meanmodel)
+    l<-stats::lm(X~., weight=1/p.old, data=meanmodel)
     beta.old<-l$coeff
     mean.fit<-l$fitted
   }else if (meanmodel[1]==FALSE){
-    l<-lm(X~1, weight=1/p.old)
+    l<-stats::lm(X~1, weight=1/p.old)
     beta.old<-l$coeff
     mean.fit<-l$fitted
   }
@@ -43,15 +53,14 @@ loop_em<-function(meanmodel, theta.old, p.old, x.0, X, maxit, eps){
 
     ##calculate weighting for next LM - bounded at 1e10
     wt=1/p.old
-    wt[wt > 1e10] <- 1e10
-    ##calculate weighted mean - weighted by inverse variance FROM LM WEIGHTED MODEL
+    wt[wt > 1e10] <- 1e10 ##finite bound on the weight
     if (is.null(meanmodel)==TRUE){
     }else if (is.data.frame(meanmodel)==TRUE){
-      l<-lm(X~., weight=wt, data=meanmodel)
+      l<-stats::lm(X~., weight=wt, data=meanmodel)
       beta.new<-l$coeff
       mean.fit<-l$fitted
     }else if (meanmodel[1]==FALSE){
-      l<-lm(X~1, weight=wt)
+      l<-stats::lm(X~1, weight=wt)
       beta.new<-l$coeff
       mean.fit<-l$fitted
     }
