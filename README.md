@@ -12,6 +12,26 @@
 [![](http://cranlogs.r-pkg.org/badges/last-week/VarReg?color=yellow)](https://cran.r-project.org/package=VarReg)
 <!-- badges: end -->
 
+<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
+
+<!-- display the social media buttons in your README -->
+
+<!--[![alt text][1.1]][1] -->
+
+<!-- links to social media icons -->
+
+<!-- no need to change these -->
+
+<!-- icons with padding -->
+
+<!-- icons without padding -->
+
+<!-- links to your social media accounts -->
+
+<!-- update these accordingly -->
+
+<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
+
 The goal of VarReg is to provide methods for fitting semi-parametric
 mean and variance models, with normal or censored data. This has also
 been extended to allow a regression in the location, scale and shape
@@ -25,8 +45,8 @@ Kristy Robledo <https://github.com/kristyrobledo>
 
 NHMRC Clinical Trials Centre, University of Sydney
 
-\[\[alt text\]\[1.1\]\]\[1\] \[1.1\]: <http://i.imgur.com/tXSoThF.png>
-\[1\]: <http://www.twitter.com/redheadkristy>
+Follow me on [![alt text](http://i.imgur.com/wWzX9uB.png
+"twitter icon without padding")](http://www.twitter.com/redheadkristy)
 
 ## :arrow\_double\_down: Installation
 
