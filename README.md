@@ -36,9 +36,6 @@ Kristy Robledo <https://github.com/kristyrobledo>
 
 NHMRC Clinical Trials Centre, University of Sydney
 
-Follow me on [![alt
-text](http://i.imgur.com/wWzX9uB.png "twitter icon without padding")](http://www.twitter.com/kristyrobledo)
-
 ## :arrow_double_down: Installation
 
 You can install the released version of VarReg from

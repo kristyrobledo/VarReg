@@ -57,8 +57,6 @@ library(badger)
 <!-- links to your social media accounts -->
 <!-- update these accordingly -->
 
-[1]: http://www.twitter.com/kristyrobledo
-
 
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
@@ -71,7 +69,6 @@ Kristy Robledo <https://github.com/kristyrobledo>
 
 NHMRC Clinical Trials Centre, University of Sydney
 
-Follow me on [![alt text][1.2]][1]
 
 ## :arrow_double_down: Installation
 
