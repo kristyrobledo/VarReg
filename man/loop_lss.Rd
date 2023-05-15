@@ -4,8 +4,20 @@
 \alias{loop_lss}
 \title{The EM loop for the LSS model}
 \usage{
-loop_lss(alldat, xiold, omega2old, nuold, mean.ind, var.ind, nu.ind, para.space,
-  maxit, eps, int.maxit, print.it)
+loop_lss(
+  alldat,
+  xiold,
+  omega2old,
+  nuold,
+  mean.ind,
+  var.ind,
+  nu.ind,
+  para.space,
+  maxit,
+  eps,
+  int.maxit,
+  print.it
+)
 }
 \arguments{
 \item{alldat}{Dataframe containing all the data for the models. Outcome in the first column.}

@@ -42,7 +42,7 @@ censloop_em<-function(meanmodel, theta.old,beta.old, p.old, x.0, X,censor.ind, m
   c_2<-X*z
   c_2[censor.ind==1]<-NA
   beta.old<-NULL
-  outmean<-mean.models(c_1, c_2, z,n, meanmodel,mean.intercept, beta.old, maxit, eps)
+  outmean<-m_models(c_1, c_2, z,n, meanmodel,mean.intercept, beta.old, maxit, eps)
   mean.fit<-outmean$mean.fit
   beta.old<-outmean$beta.new
   beta.new<-beta.old
@@ -87,7 +87,7 @@ censloop_em<-function(meanmodel, theta.old,beta.old, p.old, x.0, X,censor.ind, m
    c_2[censor.ind==1]<-NA
 
    outmean<-tryCatch({
-     mean.models(c_1, c_2, z,n, meanmodel,mean.intercept,beta.old, maxit, eps)
+     m_models(c_1, c_2, z,n, meanmodel,mean.intercept,beta.old, maxit, eps)
    },error=function(cond){
      message("Mean model (survreg) failed to converge at maxit=", maxit, ". Attempting more iterations.")
      return(NULL)
@@ -96,7 +96,7 @@ censloop_em<-function(meanmodel, theta.old,beta.old, p.old, x.0, X,censor.ind, m
    })
    if (is.null(outmean)==TRUE || any(is.nan(outmean$beta.new))){
      outmean<-tryCatch({
-       mean.models(c_1, c_2, z,n, meanmodel,mean.intercept,beta.old, maxit*100, eps)
+       m_models(c_1, c_2, z,n, meanmodel,mean.intercept,beta.old, maxit*100, eps)
      },error=function(cond){
        message("Mean model (survreg) still failed to converge at maxit=", maxit, "*100. Review initial estimates.")
        return(NULL)
@@ -147,7 +147,7 @@ censloop_em<-function(meanmodel, theta.old,beta.old, p.old, x.0, X,censor.ind, m
 }
 
 
-mean.models<-function(c_1, c_2, z,n, meanmodel,mean.intercept,beta.old, maxit, eps){
+m_models<-function(c_1, c_2, z,n, meanmodel,mean.intercept,beta.old, maxit, eps){
   if (is.null(meanmodel)==TRUE){
     mean.fit<-rep(0,n)
     beta.new<-NULL

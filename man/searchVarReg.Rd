@@ -4,9 +4,19 @@
 \alias{searchVarReg}
 \title{Searches for best semi parametric mean and variance regression model}
 \usage{
-searchVarReg(y, x, cens.ind = NULL, maxknots.m = 3, maxknots.v = 3,
-  degree = 2, mono.var = c("none", "inc", "dec"), selection = c("AIC",
-  "AICc", "HQC", "BIC"), print.it = FALSE, control = list(...), ...)
+searchVarReg(
+  y,
+  x,
+  cens.ind = NULL,
+  maxknots.m = 3,
+  maxknots.v = 3,
+  degree = 2,
+  mono.var = c("none", "inc", "dec"),
+  selection = c("AIC", "AICc", "HQC", "BIC"),
+  print.it = FALSE,
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{y}{Vector containing outcome data. Must be no missing data and any censored values must

@@ -4,8 +4,15 @@
 \alias{seVarReg}
 \title{SE calculations for mean and variance regression models}
 \usage{
-seVarReg(x, boot = FALSE, bootreps = 1000, vector.mean = x$data[, 2],
-  vector.variance = x$data[, 2], control = list(...), ...)
+seVarReg(
+  x,
+  boot = FALSE,
+  bootreps = 1000,
+  vector.mean = x$data[, 2],
+  vector.variance = x$data[, 2],
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{x}{Object of class \code{VarReg} to determin the SE (eg. result from \code{\link{semiVarReg}}).}

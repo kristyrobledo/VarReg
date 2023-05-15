@@ -25,7 +25,7 @@ library(palmerpenguins)
 library(tidyverse)
 
 cc<-penguins %>%
-  na.omit()
+  na.omit(penguins)
 y<-cc$body_mass_g
 x<-as.data.frame(cbind(cc$bill_length_mm, cc$flipper_length_mm,cc$bill_depth_mm,
                        cc$bill_length_mm*sqrt(2), cc$flipper_length_mm*sqrt(2),cc$bill_depth_mm*sqrt(2)))

@@ -4,12 +4,14 @@
 \name{mcycle}
 \alias{mcycle}
 \title{mcycle dataset.}
-\format{A data frame with 133 rows and 2 variables:
+\format{
+A data frame with 133 rows and 2 variables:
 \describe{
   \item{times}{in milliseconds from time of impact}
   \item{accel}{in g, acceleration of the head}
   ...
-}}
+}
+}
 \source{
 Silverman, B. W. (1985) Some aspects of the spline smoothing approach to non-parametric curve
 fitting. Journal of the Royal Statistical Society series B 47, 1-52.

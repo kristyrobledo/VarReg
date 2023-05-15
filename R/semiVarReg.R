@@ -60,6 +60,7 @@
 #'  corresponds to the censoring indicator.
 #'  \item\code{data}: Dataframe containing the variables included in the model.}
 #'
+#'
 #'@examples
 #'data(mcycle)
 #'## run a model with linear mean and linear variance:

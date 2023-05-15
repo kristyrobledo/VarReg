@@ -5,17 +5,23 @@
 #'@param y Vector containing outcome data. Must be no missing data and any censored values must
 #' be set to the limits of detection.
 #'@param x Matrix containing the covariate data. Must be no missing data and same length as \code{y}.
-#'@param meanmodel Vector to specify the mean model to be fit to the data. The possible inputs are
+#'@param mean.model Vector to specify the mean model to be fit to the data. The possible inputs are
 #'  \code{"zero"}, \code{"constant"}, or a vector to indicate if covariates are to be \code{"linear"} or \code{"semi"}. \code{"semi"}
 #'  indicates a semi-parametric spline model, with the number of internal knots specified in
-#'  \code{knots.m}.
-#'@param varmodel Vector to specify the variance model to be fit to the data. The possible inputs are
+#'  \code{knots.m}. If covariates are fit, each covariate needs an indicator of \code{"linear"} or \code{"semi"}, where \code{mean.vars} specifies each covariate.
+#'@param mean.vars Vector to specify column(s) in \code{x} referring to covariates to be fit in the mean model,
+#'  eg c(1,2) indicates columns 1 and 2 in \code{x}. Must be the same length as \code{mean.model} which specifies
+#'  if they are fit as linear/semi. If semi, use \code{knots.m} to specify knots.
+#'@param var.model Vector to specify the variance model to be fit to the data. The possible inputs are
 #' \code{"constant"}, or a vector to indicate if each covariate is to be \code{"linear"} or \code{"semi"}. \code{"semi"} indicates a semi-parametric
 #' B-spline model, with the number of internal knots specified in \code{knots.v}.
-#'@param knots.m Integer indicating the number of internal knots to be fit in the semi-parametric
-#' mean model. Knots are placed equidistantly over the covariate. The default value is \code{2}.
-#'@param knots.v Integer indicating the number of internal knots to be fit in the semi-parametric
-#'  variance model. Knots are placed equidistantly over the covariate. The default value is \code{2}.
+#'@param var.vars Vector to specify column(s) in \code{x} referring to covariates to be fit in the variance model,
+#'  eg c(1,2) indicates columns 1 and 2 in \code{x}. Must be the same length as \code{var.model} which specifies
+#'  if they are fit as linear/semi. If semi, use \code{knots.v} to specify knots.
+#'@param knots.m Vector indicating the number of internal knots to be fit in each of covariate(s) fit in the semi-parametric
+#' mean model. Must be one entry per \code{"semi"} covariate in \code{mean.model}. Knots are placed equidistantly over each covariate.
+#'@param knots.v Vector indicating the number of internal knots to be fit in the semi-parametric
+#'  variance model. Knots are placed equidistantly over the covariate.
 #'@param degree Integer indicating the degree of the splines fit in the mean and the variance models.
 #' The default value is \code{2}.
 #' @param control list of control parameters. See \code{\link{VarReg.control}}.
@@ -45,17 +51,12 @@
 #'@examples
 #'data(mcycle)
 #'## run a model with linear mean and linear variance:
-#'linmodel<-semiVarReg.multi(mcycle$accel, mcycle$times, meanmodel="linear", varmodel="linear",
-#'  maxit=10000)
+#'linmodel<-semiVarReg.multi(mcycle$accel, x=mcycle, mean.model="linear",mean.vars=2,
+#'var.model="linear", var.vars=2,  maxit=10000)
 #'## run a model with semi-parametric mean (4 internal knots) and semi-parametric variance (2 knots):
 #'##not run
-#'##semimodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
-#'##knots.m=4, knots.v=2, maxit=10000)
-#'## run a model with semi-parametric mean (4 internal knots) and semi-parametric monotonic
-#'## variance (2 knots):
-#'## not run
-#'##semimodel_inc<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
-#'##knots.m=4, knots.v=2, mono.var="inc")
+#'##semimodel<-semiVarReg.multi(mcycle$accel, x=mcycle, meanmodel="semi",mean.vars=2, varmodel="semi",
+#'##var.vars=2,knots.m=4, knots.v=2, maxit=10000)
 #'@export
 
 

@@ -57,7 +57,7 @@ library(badger)
 <!-- links to your social media accounts -->
 <!-- update these accordingly -->
 
-[1]: http://www.twitter.com/redheadkristy
+[1]: http://www.twitter.com/kristyrobledo
 
 
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
@@ -134,7 +134,7 @@ plotVarReg(semimodel)
 ##knots.m=4, knots.v=2, mono.var="inc")
 ```
 
-Lastly, we can fit a model with a model in the location, scale and shape. Im not going to run this, just show the code as it takes a while to run on my laptop!
+Lastly, we can fit a model with a model in the location, scale and shape. Im not going to run this, just show the code, as it takes a while to run on my laptop!
 
 ```{r lss}
  ##  LSS model followed by the basic plot command

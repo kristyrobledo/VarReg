@@ -2,16 +2,17 @@
 #'
 #' \code{lssVarReg.multi} performs a semiparametric location (\eqn{\xi} or xi), shape (\eqn{\nu} or nu) and scale (\eqn{\omega} or omega) regression model. This is designed for multiple covariates that are fit in the location, scale and shape models.
 #' @param y Vector containing outcome data. Must be no missing data.
-#' @param x Vector containing the covariate data, same length as \code{y}. Must be no missing data.
-#' @param locationmodel Text to specify the location model to be fit. Options: \code{"constant"} = constant model (intercept only), \code{"linear"} = linear term with x covariate, \code{"semi"} = semiparametric spline (specify with \code{knots.l}).
-#' @param scale2model Text to specify the scale^2 model to be fit. Options: \code{"constant"} = constant term only, \code{"linear"} = linear term with \code{x} covariate, \code{"semi"} = semiparametric spline (specify with \code{knots.sc})
-#' @param shapemodel Text to specify the shape model to be fit. Options: \code{"constant"} = constant shape model, \code{"linear"} = linear term with x covariate, \code{"semi"} = semiparametric spline (specify with \code{knots.sh}).
-#' @param knots.l Integer indicating the number of internal knots to be fit in the location model. Default is '2'. (Note that the knots are placed equidistantly over x.)
-#' @param knots.sc Integer indicating the number of internal knots to be fit in the scale^2 model. Default is '2'. (Note that the knots are placed equidistantly over x.)
-#' @param knots.sh Integer indicating the number of internal knots to be fit in the shape model. Default is '2'. (Note that the knots are placed equidistantly over x.)
-#' @param degree Integer to indicate the degree of the splines fit in the location and scale.  Default is '2'.
-#' @param mono.scale Text to indicate whether the scale2 model is monotonic. Default is \code{"none"} (no monotonic constraints). Options are \code{"inc"} for increasing or \code{"dec"} for decreasing. If this is chosen, the appropriate \code{para.space} is set automatically (\code{"positive"} for \code{inc}, \code{"negative"} for \code{dec}).
-#' @param para.space Text to indicate the parameter space to search for scale2 parameter estimates. \code{"positive"} means only search positive parameter space, \code{"negative"} means search only negative parameter space and \code{"all"} means search all parameter spaces. Default is \code{all}.
+#' @param x Matrix containing the covariate data, same length as \code{y}. Must be no missing data.
+#' @param locationmodel Vector to specify the location model to be fit for each covariate. Options: \code{"constant"} = constant model (intercept only), \code{"linear"} = linear term with x covariate, \code{"semi"} = semiparametric spline (specify with \code{knots.l}).
+#' @param location.vars Vector to specify the column(s) in \code{x} referring to covariates to be fit in the location model, eg c(1,2) indicates columns 1 and 2 in \code{x}. Must be the same length as \code{locationmodel} which specifies if they are fit as linear/semi. If semi, use \code{knots.l} to specify knots.
+#' @param scale2model Vector to specify the scale^2 model to be fit for each covariate. Options: \code{"constant"} = constant term only, \code{"linear"} = linear term with \code{x} covariate, \code{"semi"} = semiparametric spline (specify with \code{knots.sc})
+#' @param scale2.vars Vector to specify the column(s) in \code{x} referring to covariates to be fit in the scale^2 model, eg c(1,2) indicates columns 1 and 2 in \code{x}. Must be the same length as \code{scale2model} which specifies if they are fit as linear/semi. If semi, use \code{knots.sc} to specify knots.
+#' @param shapemodel Vector to specify the shape model to be fit for each covariate. Options: \code{"constant"} = constant shape model, \code{"linear"} = linear term with x covariate, \code{"semi"} = semiparametric spline (specify with \code{knots.sh}).
+#' @param shape.vars Vector to specify the column(s) in \code{x} referring to covariates to be fit in the shape model, eg c(1,2) indicates columns 1 and 2 in \code{x}. Must be the same length as \code{shapemodel} which specifies if they are fit as linear/semi. If semi, use \code{knots.sh} to specify knots.
+#' @param knots.l Vector indicating the number of internal knots to be fit in the location model for each covariate. Default is '2'. (Note that the knots are placed equidistantly over x.)
+#' @param knots.sc Vector indicating the number of internal knots to be fit in the scale^2 model for each covariate. Default is '2'. (Note that the knots are placed equidistantly over x.)
+#' @param knots.sh Vector indicating the number of internal knots to be fit in the shape model for each covariate. Default is '2'. (Note that the knots are placed equidistantly over x.)
+#' @param degree Integer to indicate the degree of the splines fit in the location, scale and shape.  Default is '2'.
 #' @param location.init Vector of initial parameter estimates for the location model. Defaults to vector of 1's of appropriate length.
 #' @param scale2.init Vector of initial parameter estimates for the scale^2 model. Defaults to vector of 1's of appropriate length.
 #' @param shape.init Vector of initial parameter estimates for the shape model. Defaults to vector of 1's of appropriate length.
@@ -24,7 +25,7 @@
 #' \code{lssVarReg} returns an object of class \code{"lssVarReg"}, which inherits most from class
 #' \code{"VarReg"}. This object of class \code{lssVarReg} is a list of the following components:
 #' \itemize{
-#' \item \code{modeltype}: Text indicating the model that was fit, always "LSS model".
+#' \item \code{modeltype}: Text indicating the model that was fit, always "LSS model" for this model.
 #' \item \code{locationmodel}, \code{scale2model}, \code{shapemodel}, \code{knots.l}, \code{knots.sc},
 #' \code{knots.sh}, \code{degree},\code{mono.scale} : Returning the input variables as described above
 #' \item\code{converged}: Logical argument indicating if convergence occurred.
@@ -46,12 +47,19 @@
 #'  \code{\link{VarReg.control}}  \code{\link{plotlssVarReg}}
 #'
 #'@examples
-# 'data(mcycle)
-#' ## run a model with linear mean, linear variance and constant shape (not run):
-#' ## lssmodel<-lssVarReg(mcycle$accel, mcycle$times,  locationmodel="linear", scale2model="linear",
-#' ## shapemodel="constant",  maxit=10000)
+#' ## not run
+#' ## library(palmerpenguins)
+#' ## cc<-na.omit(penguins)
+#' ## y<-cc$body_mass_g
+#' ## x<-as.data.frame(cbind(cc$bill_length_mm, cc$flipper_length_mm,cc$bill_depth_mm))
+#' ## colnames(x) <-c("bill length mm", "flipper length mm","bill depth mm")
+#' ## model1<-lssVarReg.multi(y, x,
+#' ##                         locationmodel="linear", location.vars = 2,
+#' ##                         scale2model="constant",
+#' ##                         shapemodel=c("linear", "semi"), shape.vars = c(2,3),
+#' ##                         knots.sh = 1, int.maxit=10 )
+#' ## model1[-21] ## print model
 #' @export
-
 
 lssVarReg.multi<-function(y, x,
                           locationmodel=c("constant", "linear", "semi"),
@@ -137,14 +145,14 @@ lssVarReg.multi<-function(y, x,
     for (i in 1:length(locationmodel)){
       #print(i)
       if(locationmodel[i]=="semi"){
-        print("semi")
+        #print("semi")
         msemicounter<-msemicounter+1
         bmean<-splines::bs(x=x[,location.vars[i]], df=(degree+knots.l[msemicounter]), degree=degree)
         colnames(bmean) <- paste(paste(paste(colnames(x)[location.vars[i]], "Knt", sep="_"),knots.l[msemicounter], sep = ""), paste("Base", colnames(bmean), sep=""), sep = "_")
         alldat<-data.frame(alldat, bmean)
         mean.ind[length(mean.ind)+1:(ncol(bmean))]<-which(colnames(alldat)%in%colnames(bmean))
        }else if (locationmodel[i]=="linear"){
-        print("linear")
+        #print("linear")
         mean.ind[length(mean.ind)+1]<-location.vars[i]+2 ##assign next free place in vector with covariate
         }
     }
@@ -170,16 +178,16 @@ lssVarReg.multi<-function(y, x,
       var.ind<-NULL
 
       for (i in 1:length(scale2model)){
-        print(i)
+        #print(i)
         if(scale2model[i]=="semi"){
-          print("semi")
+          #print("semi")
           vsemicounter<-vsemicounter+1
           bvar<-splines::bs(x=x[,scale2.vars[i]], df=(degree+knots.sc[vsemicounter]), degree=degree)
           colnames(bvar) <- paste(paste(paste(colnames(x)[scale2.vars[i]],"Knt",sep="_"),knots.sc[vsemicounter], sep = ""), paste("Base", colnames(bvar), sep=""), sep = "_")
           alldat<-data.frame(alldat, bvar)
           var.ind[length(var.ind)+1:(ncol(bvar))]<-which(colnames(alldat)%in%colnames(bvar))
          }else if (scale2model[i]=="linear"){
-          print("linear")
+          #print("linear")
           var.ind[length(var.ind)+1]<-scale2.vars[i]+2 ##assign next free place in vector with covariate
          }
       }
@@ -205,9 +213,9 @@ lssVarReg.multi<-function(y, x,
   } else if (length(shapemodel)>=1){
     nu.ind<-NULL
     for (i in 1:length(shapemodel)){
-      print(i)
+      #print(i)
       if(shapemodel[i]=="semi"){
-        print("semi")
+        #print("semi")
         ssemicounter<-ssemicounter+1
         bsh<-splines::bs(x=x[,shape.vars[i]], df=(degree+knots.sh[ssemicounter]), degree=degree)
         colnames(bsh) <- paste(paste(paste(colnames(x)[shape.vars[i]],"Knt",sep="_"),knots.sh[ssemicounter], sep = ""), paste("Base", colnames(bsh), sep=""), sep = "_")

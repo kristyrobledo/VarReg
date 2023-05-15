@@ -4,8 +4,17 @@
 \alias{plotVarReg}
 \title{Plots graphics for a mean and variance regression model}
 \usage{
-plotVarReg(x, knot.lines = FALSE, ci = FALSE, ci.type = c("im", "boot"),
-  bootreps = 1000, xlab = "x", ylab = "y", control = list(...), ...)
+plotVarReg(
+  x,
+  knot.lines = FALSE,
+  ci = FALSE,
+  ci.type = c("im", "boot"),
+  bootreps = 1000,
+  xlab = "x",
+  ylab = "y",
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{x}{Object of class \code{VarReg} (see \code{\link{semiVarReg}}).}

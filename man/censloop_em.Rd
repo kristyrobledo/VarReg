@@ -4,8 +4,18 @@
 \alias{censloop_em}
 \title{The Censored data EM loop}
 \usage{
-censloop_em(meanmodel, theta.old, beta.old, p.old, x.0, X, censor.ind,
-  mean.intercept, maxit, eps)
+censloop_em(
+  meanmodel,
+  theta.old,
+  beta.old,
+  p.old,
+  x.0,
+  X,
+  censor.ind,
+  mean.intercept,
+  maxit,
+  eps
+)
 }
 \arguments{
 \item{meanmodel}{Dataframe containing only the covariates to be fit in the mean model. NULL for zero mean model and FALSE for constant mean model.}

@@ -53,7 +53,13 @@
 #' @export
 
 
-lssVarReg<-function(y, x, locationmodel=c("constant", "linear", "semi"), scale2model=c("constant", "linear", "semi"), shapemodel=c("constant", "linear"), knots.l=2, knots.sc=2,knots.sh=2, degree=2, mono.scale=c("none", "inc", "dec"), para.space=c("all", "positive", "negative"), location.init=NULL, scale2.init=NULL,shape.init=NULL, int.maxit=1000, print.it=FALSE, control=list(...), ...) {
+lssVarReg<-function(y, x, locationmodel=c("constant", "linear", "semi"),
+                    scale2model=c("constant", "linear", "semi"),
+                    shapemodel=c("constant", "linear"),
+                    knots.l=2, knots.sc=2,knots.sh=2, degree=2,
+                    mono.scale=c("none", "inc", "dec"),
+                    para.space=c("all", "positive", "negative"),
+                    location.init=NULL, scale2.init=NULL,shape.init=NULL, int.maxit=1000, print.it=FALSE, control=list(...), ...) {
   locationmodel<-match.arg(locationmodel)
   scale2model<-match.arg(scale2model)
   shapemodel<-match.arg(shapemodel)

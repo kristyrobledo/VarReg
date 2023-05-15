@@ -4,7 +4,6 @@
 \name{VarReg}
 \alias{VarReg}
 \alias{VarReg-package}
-\alias{VarReg-package}
 \title{VarReg: Semi-parametric mean and variance regression}
 \description{
 Methods for fitting semi-parametric mean and variance models, with normal or censored data.
@@ -13,7 +12,7 @@ Also extended to allow a regression in the location, scale and shape parameters.
 \details{
 This package provides functions to fit semi-parametric mean and variance regression models. These models
 are based upon EM-type algorithms, which can have more stable convergence properties than other
- algorithms for additive variance regression models.
+algorithms for additive variance regression models.
 
 The primary function to use for linear and semi-parametric mean and variance models is \code{\link{semiVarReg}}.
 This function also is able to fit models to censored outcome data. There is also a plot function for these
@@ -25,6 +24,8 @@ The other functions that are of particular use are \code{\link{lssVarReg}} and i
 \code{\link{plotlssVarReg}}. This uses the skew-normal distribution and combines the EM algorithm with
 a coordinate-ascent type algorithm in order to fit a regression model in the location, scale and shape,
  therefore extending the semi-parametric models to non-normal data.
+
+  Multivariate models can be fit with \code{\link{semiVarReg.multi}} and \code{\link{lssVarReg.multi}}
 }
 \author{
 Kristy Robledo \email{robledo.kristy@gmail.com}

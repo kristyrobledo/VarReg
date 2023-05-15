@@ -6,30 +6,21 @@
 <!-- badges: start -->
 
 [![](https://www.r-pkg.org/badges/version/VarReg?color=orange)](https://cran.r-project.org/package=VarReg)
-[![](https://img.shields.io/badge/devel%20version-1.0.2-blue.svg)](https://github.com/kristyrobledo/VarReg)
+[![](https://img.shields.io/badge/devel%20version-2.0-blue.svg)](https://github.com/kristyrobledo/VarReg)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/VarReg?color=blue)](https://cran.r-project.org/package=VarReg)
 [![](http://cranlogs.r-pkg.org/badges/last-month/VarReg?color=green)](https://cran.r-project.org/package=VarReg)
 [![](http://cranlogs.r-pkg.org/badges/last-week/VarReg?color=yellow)](https://cran.r-project.org/package=VarReg)
 <!-- badges: end -->
 
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
-
 <!-- display the social media buttons in your README -->
-
 <!--[![alt text][1.1]][1] -->
-
 <!-- links to social media icons -->
-
 <!-- no need to change these -->
-
 <!-- icons with padding -->
-
 <!-- icons without padding -->
-
 <!-- links to your social media accounts -->
-
 <!-- update these accordingly -->
-
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
 The goal of VarReg is to provide methods for fitting semi-parametric
@@ -39,16 +30,16 @@ parameters. This algorithm is based upon an EM (Expectation
 Maximisation) algorithm, so is more stable than other similar methods
 like GAMLSS.
 
-## :raising\_hand: Author
+## :raising_hand: Author
 
 Kristy Robledo <https://github.com/kristyrobledo>
 
 NHMRC Clinical Trials Centre, University of Sydney
 
-Follow me on [![alt text](http://i.imgur.com/wWzX9uB.png
-"twitter icon without padding")](http://www.twitter.com/redheadkristy)
+Follow me on [![alt
+text](http://i.imgur.com/wWzX9uB.png "twitter icon without padding")](http://www.twitter.com/kristyrobledo)
 
-## :arrow\_double\_down: Installation
+## :arrow_double_down: Installation
 
 You can install the released version of VarReg from
 [CRAN](https://CRAN.R-project.org) with:
@@ -133,8 +124,8 @@ plotVarReg(semimodel)
 ```
 
 Lastly, we can fit a model with a model in the location, scale and
-shape. Im not going to run this, just show the code as it takes a while
-to run on my laptop\!
+shape. Im not going to run this, just show the code, as it takes a while
+to run on my laptop!
 
 ``` r
  ##  LSS model followed by the basic plot command
@@ -142,4 +133,4 @@ to run on my laptop\!
 #plotlssVarReg(lssmodel, xlab="Time in seconds", ylab="Acceleration")
 ```
 
-Enjoy\!
+Enjoy!

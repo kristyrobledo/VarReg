@@ -1,10 +1,10 @@
 Package: VarReg
 Type: Package
 Title: Semi-Parametric Variance Regression
-Version: 1.0.2
+Version: 2.0
 Authors@R: c(person("Kristy","Robledo", email = "robledo.kristy@gmail.com", role = c("aut", "cre")),person("Ian", "Marschner", role = c("ths")))
 Maintainer: Kristy Robledo <robledo.kristy@gmail.com>
-Description: Methods for fitting semi-parametric mean and variance models, with normal or censored data. Also extended to allow a regression in the location, scale and shape parameters.
+Description: Methods for fitting semi-parametric mean and variance models, with normal or censored data. Extended to allow a regression in the location, scale and shape parameters, and further for multiple regression in each.
 License: GPL-3
 Depends: R (>= 2.10)
 LazyData: TRUE
@@ -17,4 +17,5 @@ Imports:
     sn,
     survival,
     utils
-RoxygenNote: 6.0.0
+RoxygenNote: 7.2.3
+Encoding: UTF-8

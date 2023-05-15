@@ -4,11 +4,21 @@
 \alias{semiVarReg}
 \title{Semi parametric mean and variance regression}
 \usage{
-semiVarReg(y, x, cens.ind = NULL, meanmodel = c("zero", "constant",
-  "linear", "semi"), mean.intercept = TRUE, varmodel = c("constant",
-  "linear", "semi"), knots.m = 2, knots.v = 2, degree = 2,
-  mono.var = c("none", "inc", "dec"), para.space = c("all", "positive",
-  "negative"), control = list(...), ...)
+semiVarReg(
+  y,
+  x,
+  cens.ind = NULL,
+  meanmodel = c("zero", "constant", "linear", "semi"),
+  mean.intercept = TRUE,
+  varmodel = c("constant", "linear", "semi"),
+  knots.m = 2,
+  knots.v = 2,
+  degree = 2,
+  mono.var = c("none", "inc", "dec"),
+  para.space = c("all", "positive", "negative"),
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{y}{Vector containing outcome data. Must be no missing data and any censored values must

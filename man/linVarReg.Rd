@@ -4,8 +4,14 @@
 \alias{linVarReg}
 \title{Linear mean and variance regression function}
 \usage{
-linVarReg(dat, var.ind = c(2), mean.ind = c(2), para.space = c("all",
-  "positive", "negative"), control = list(...), ...)
+linVarReg(
+  dat,
+  var.ind = c(2),
+  mean.ind = c(2),
+  para.space = c("all", "positive", "negative"),
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{dat}{Dataframe containing outcome and covariate data. Outcome data must be in the first column. Covariates for mean and variance model in next columns.}

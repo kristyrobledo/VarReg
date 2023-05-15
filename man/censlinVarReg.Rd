@@ -4,9 +4,18 @@
 \alias{censlinVarReg}
 \title{Censored Linear mean and variance regression}
 \usage{
-censlinVarReg(dat, mean.ind = c(2), var.ind = c(2), cens.ind = c(3),
-  mean.intercept = TRUE, para.space = c("all", "positive", "negative"),
-  mean.init = NULL, var.init = NULL, control = list(...), ...)
+censlinVarReg(
+  dat,
+  mean.ind = c(2),
+  var.ind = c(2),
+  cens.ind = c(3),
+  mean.intercept = TRUE,
+  para.space = c("all", "positive", "negative"),
+  mean.init = NULL,
+  var.init = NULL,
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{dat}{Dataframe containing outcome and covariate data. Outcome data must be in the first column, with censored values set to the limits. Covariates for mean and variance model in next columns.}
