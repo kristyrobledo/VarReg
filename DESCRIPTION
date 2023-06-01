@@ -6,7 +6,7 @@ Authors@R: c(person("Kristy","Robledo", email = "robledo.kristy@gmail.com", role
 Maintainer: Kristy Robledo <robledo.kristy@gmail.com>
 Description: Methods for fitting semi-parametric mean and variance models, with normal or censored data. Extended to allow a regression in the location, scale and shape parameters, and further for multiple regression in each.
 License: GPL-3
-Depends: R (>= 2.10)
+Depends: R (>= 3.5.0)
 LazyData: TRUE
 Suggests:
     testthat
