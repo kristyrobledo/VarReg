@@ -1,7 +1,7 @@
 Package: VarReg
 Type: Package
 Title: Semi-Parametric Variance Regression
-Version: 2.0
+Version: 2.0.1
 Authors@R: c(person("Kristy","Robledo", email = "robledo.kristy@gmail.com", role = c("aut", "cre")),person("Ian", "Marschner", role = c("ths")))
 Maintainer: Kristy Robledo <robledo.kristy@gmail.com>
 Description: Methods for fitting semi-parametric mean and variance models, with normal or censored data. Extended to allow a regression in the location, scale and shape parameters, and further for multiple regression in each.
