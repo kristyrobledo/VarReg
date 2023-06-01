@@ -63,6 +63,9 @@ library(badger)
 The goal of VarReg is to provide methods for fitting semi-parametric mean and variance models, with normal or censored data. This has also been extended to allow a regression in the location, scale and shape parameters.
 This algorithm is based upon an EM (Expectation Maximisation) algorithm, so is more stable than other similar methods like GAMLSS.
 
+There is a algorithm paper published:
+Robledo, K.P., Marschner, I.C. A new algorithm for fitting semi-parametric variance regression models. Comput Stat 36, 2313–2335 (2021). <https://doi.org/10.1007/s00180-021-01067-6>
+
 ## :raising_hand: Author
 
 Kristy Robledo <https://github.com/kristyrobledo>
@@ -81,11 +84,13 @@ install.packages("VarReg")
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("kristyrobledo/VarReg")
+remotes::install_github("kristyrobledo/VarReg")
 ```
 ## :book: Examples
 
+For more examples, see this repository [https://github.com/kristyrobledo/VarReg-paper-code](https://github.com/kristyrobledo/VarReg-paper-code)
+ which is based on providing the code from a draft software paper here [https://github.com/kristyrobledo/VarReg-paper](https://github.com/kristyrobledo/VarReg-paper). 
+ 
 This is a basic example to read in the mcycle dataset and perform a linear model in the mean and the variance:
 
 ```{r example}

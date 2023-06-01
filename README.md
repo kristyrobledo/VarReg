@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![](https://www.r-pkg.org/badges/version/VarReg?color=orange)](https://cran.r-project.org/package=VarReg)
-[![](https://img.shields.io/badge/devel%20version-2.0-blue.svg)](https://github.com/kristyrobledo/VarReg)
+[![](https://img.shields.io/badge/devel%20version-2.0.1-blue.svg)](https://github.com/kristyrobledo/VarReg)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/VarReg?color=blue)](https://cran.r-project.org/package=VarReg)
 [![](http://cranlogs.r-pkg.org/badges/last-month/VarReg?color=green)](https://cran.r-project.org/package=VarReg)
 [![](http://cranlogs.r-pkg.org/badges/last-week/VarReg?color=yellow)](https://cran.r-project.org/package=VarReg)
@@ -30,6 +30,11 @@ parameters. This algorithm is based upon an EM (Expectation
 Maximisation) algorithm, so is more stable than other similar methods
 like GAMLSS.
 
+There is a algorithm paper published: Robledo, K.P., Marschner, I.C. A
+new algorithm for fitting semi-parametric variance regression models.
+Comput Stat 36, 2313–2335 (2021).
+<https://doi.org/10.1007/s00180-021-01067-6>
+
 ## :raising_hand: Author
 
 Kristy Robledo <https://github.com/kristyrobledo>
@@ -48,11 +53,15 @@ install.packages("VarReg")
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("kristyrobledo/VarReg")
+remotes::install_github("kristyrobledo/VarReg")
 ```
 
 ## :book: Examples
+
+For more examples, see this repository
+<https://github.com/kristyrobledo/VarReg-paper-code> which is based on
+providing the code from a draft software paper here
+<https://github.com/kristyrobledo/VarReg-paper>.
 
 This is a basic example to read in the mcycle dataset and perform a
 linear model in the mean and the variance:
