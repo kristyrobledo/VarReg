@@ -1,0 +1,10 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  VarReg: VarReg.html
+last_built: 2023-08-09T02:14Z
+urls:
+  reference: https://kristyrobledo.github.io/VarReg/reference
+  article: https://kristyrobledo.github.io/VarReg/articles
+
