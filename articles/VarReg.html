@@ -22,7 +22,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">VarReg</a>
 
@@ -77,10 +77,1337 @@
 
     
     
+<p>This repository is for the data and code presented in the paper
+published here (to be added).</p>
+<div class="section level2">
+<h2 id="install-packages">Install packages<a class="anchor" aria-label="anchor" href="#install-packages"></a>
+</h2>
+<p>Firstly, you will need to install the <code>VarReg</code> package and
+a few others to perform the code below.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/kristyrobledo/VarReg" class="external-link">VarReg</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Welcome to the 'VarReg' package to perform semi-parametric regression</span></span></code></pre></div>
-  </main>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.gamlss.com/" class="external-link">gamlss</a></span><span class="op">)</span> <span class="co">#for the CD4 dataset</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
+<span><span class="va">rna</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"resources/rna.csv"</span><span class="op">)</span> <span class="co">#load rna dataset</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="cd4-dataset">CD4 dataset<a class="anchor" aria-label="anchor" href="#cd4-dataset"></a>
+</h2>
+<p>This dataset is located within the <code>gamlss</code> package. CD4
+is a type of white blood cell, and in this dataset, it has been measured
+in uninfected children born from HIV-1 infected women. The dataset
+contains 609 measurements of CD4 cell counts and the child’s age at
+which the measurements were taken.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CD4"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">CD4</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 'data.frame':    609 obs. of  2 variables:</span></span>
+<span><span class="co">#&gt;  $ cd4: num  387 2183 904 1681 656 ...</span></span>
+<span><span class="co">#&gt;  $ age: num  4.5 0.83 2.06 1.44 2.67 1.17 1.94 1.72 2.54 1.66 ...</span></span></code></pre></div>
+<p>Lets reproduce the graphic in the paper, showing that at younger ages
+there is more variation in the CD4 counts than at older ages,
+demonstrating heteroscedasticity.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">CD4</span>, <span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">cd4</span>, x<span class="op">=</span><span class="va">age</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Age of child in years"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">ylab</span><span class="op">(</span><span class="st">"CD4 cell count"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="varregfig-cd4p1-1.png" alt=""><p class="caption">plot of chunk cd4p1</p>
+</div>
+<div class="section level3">
+<h3 id="linear-model-in-mean-and-variance">Linear model in mean and variance<a class="anchor" aria-label="anchor" href="#linear-model-in-mean-and-variance"></a>
+</h3>
+<p>Let us fit a linear model in the mean and variance model, like so</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd4.linear</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/semiVarReg.html">semiVarReg</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">CD4</span><span class="op">$</span><span class="va">cd4</span>,</span>
+<span>                       x<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>,</span>
+<span>                       meanmodel <span class="op">=</span> <span class="st">"linear"</span>,</span>
+<span>                       varmodel <span class="op">=</span> <span class="st">"linear"</span>,</span>
+<span>                       maxit<span class="op">=</span><span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
+<p>key outputs for model fit:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd4.linear</span><span class="op">$</span><span class="va">aic</span></span>
+<span><span class="co">#&gt; [1] 8999.12</span></span>
+<span><span class="va">cd4.linear</span><span class="op">$</span><span class="va">bic</span></span>
+<span><span class="co">#&gt; [1] 9016.767</span></span></code></pre></div>
+<p>Key estimates from model:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd4.linear</span><span class="op">$</span><span class="va">mean</span></span>
+<span><span class="co">#&gt; Intercept   CD4$age </span></span>
+<span><span class="co">#&gt;  884.7263 -124.8084</span></span>
+<span><span class="va">cd4.linear</span><span class="op">$</span><span class="va">variance</span></span>
+<span><span class="co">#&gt; Intercept   CD4$age </span></span>
+<span><span class="co">#&gt; 218069.56 -23922.79</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="visualise-the-model-with-plotvarreg-function">Visualise the model with <code>plotVarReg</code> function:<a class="anchor" aria-label="anchor" href="#visualise-the-model-with-plotvarreg-function"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotVarReg.html">plotVarReg</a></span><span class="op">(</span><span class="va">cd4.linear</span>, xlab <span class="op">=</span> <span class="st">"Age in years"</span>, ylab <span class="op">=</span> <span class="st">"CD4 cell count"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="varregfig-plotcd4-1.png" alt=""><p class="caption">plot of chunk plotcd4</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="searching-for-the-optimal-spline">Searching for the optimal spline<a class="anchor" aria-label="anchor" href="#searching-for-the-optimal-spline"></a>
+</h3>
+<p>Searching to a max of 7 knots in the mean and variance, with maximum
+iterations (<code>maxit</code>) of 100 to minimise time taken for the
+search:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd4.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/searchVarReg.html">searchVarReg</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">cd4</span>,</span>
+<span>                         x<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>,</span>
+<span>                         maxknots.m <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>                         maxknots.v <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>                         selection<span class="op">=</span><span class="st">"AIC"</span>,</span>
+<span>                         maxit<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+<p>lets look at the AIC table to identify where the best model is
+located:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd4.best</span><span class="op">$</span><span class="va">AIC</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kbl</span><span class="op">(</span>digits<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean_zero
+</th>
+<th style="text-align:right;">
+Mean_constant
+</th>
+<th style="text-align:right;">
+Mean_linear
+</th>
+<th style="text-align:right;">
+Mean_Knot0
+</th>
+<th style="text-align:right;">
+Mean_Knot1
+</th>
+<th style="text-align:right;">
+Mean_Knot2
+</th>
+<th style="text-align:right;">
+Mean_Knot3
+</th>
+<th style="text-align:right;">
+Mean_Knot4
+</th>
+<th style="text-align:right;">
+Mean_Knot5
+</th>
+<th style="text-align:right;">
+Mean_Knot6
+</th>
+<th style="text-align:right;">
+Mean_Knot7
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Var_constant
+</td>
+<td style="text-align:right;">
+9750.8
+</td>
+<td style="text-align:right;">
+9205.7
+</td>
+<td style="text-align:right;">
+9044.1
+</td>
+<td style="text-align:right;">
+8995.6
+</td>
+<td style="text-align:right;">
+8997.3
+</td>
+<td style="text-align:right;">
+8977.0
+</td>
+<td style="text-align:right;">
+8972.1
+</td>
+<td style="text-align:right;">
+8967.6
+</td>
+<td style="text-align:right;">
+8966.3
+</td>
+<td style="text-align:right;">
+8964.8
+</td>
+<td style="text-align:right;">
+8964.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_linear
+</td>
+<td style="text-align:right;">
+9662.4
+</td>
+<td style="text-align:right;">
+9157.1
+</td>
+<td style="text-align:right;">
+8999.8
+</td>
+<td style="text-align:right;">
+8919.5
+</td>
+<td style="text-align:right;">
+8916.2
+</td>
+<td style="text-align:right;">
+8893.4
+</td>
+<td style="text-align:right;">
+8889.8
+</td>
+<td style="text-align:right;">
+8886.4
+</td>
+<td style="text-align:right;">
+8885.6
+</td>
+<td style="text-align:right;">
+8884.5
+</td>
+<td style="text-align:right;">
+8884.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot0
+</td>
+<td style="text-align:right;">
+9554.9
+</td>
+<td style="text-align:right;">
+9157.1
+</td>
+<td style="text-align:right;">
+8947.8
+</td>
+<td style="text-align:right;">
+8839.2
+</td>
+<td style="text-align:right;">
+8834.9
+</td>
+<td style="text-align:right;">
+8862.5
+</td>
+<td style="text-align:right;">
+8890.6
+</td>
+<td style="text-align:right;">
+8905.7
+</td>
+<td style="text-align:right;">
+8912.8
+</td>
+<td style="text-align:right;">
+8916.5
+</td>
+<td style="text-align:right;">
+8920.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot1
+</td>
+<td style="text-align:right;">
+9569.4
+</td>
+<td style="text-align:right;">
+9071.5
+</td>
+<td style="text-align:right;">
+8904.2
+</td>
+<td style="text-align:right;">
+8843.9
+</td>
+<td style="text-align:right;">
+8843.7
+</td>
+<td style="text-align:right;">
+8827.6
+</td>
+<td style="text-align:right;">
+8825.4
+</td>
+<td style="text-align:right;">
+8823.6
+</td>
+<td style="text-align:right;">
+8823.3
+</td>
+<td style="text-align:right;">
+8822.8
+</td>
+<td style="text-align:right;">
+8823.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot2
+</td>
+<td style="text-align:right;">
+9529.3
+</td>
+<td style="text-align:right;">
+8998.8
+</td>
+<td style="text-align:right;">
+8897.0
+</td>
+<td style="text-align:right;">
+8842.4
+</td>
+<td style="text-align:right;">
+8843.9
+</td>
+<td style="text-align:right;">
+8810.5
+</td>
+<td style="text-align:right;">
+8804.0
+</td>
+<td style="text-align:right;">
+8799.1
+</td>
+<td style="text-align:right;">
+8797.8
+</td>
+<td style="text-align:right;">
+8797.3
+</td>
+<td style="text-align:right;">
+8798.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot3
+</td>
+<td style="text-align:right;">
+9524.5
+</td>
+<td style="text-align:right;">
+8989.1
+</td>
+<td style="text-align:right;">
+8892.3
+</td>
+<td style="text-align:right;">
+8845.5
+</td>
+<td style="text-align:right;">
+8847.5
+</td>
+<td style="text-align:right;">
+8809.0
+</td>
+<td style="text-align:right;">
+8802.2
+</td>
+<td style="text-align:right;">
+8797.2
+</td>
+<td style="text-align:right;">
+8796.2
+</td>
+<td style="text-align:right;">
+8795.6
+</td>
+<td style="text-align:right;">
+8796.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot4
+</td>
+<td style="text-align:right;">
+9526.0
+</td>
+<td style="text-align:right;">
+8989.6
+</td>
+<td style="text-align:right;">
+8893.1
+</td>
+<td style="text-align:right;">
+8848.0
+</td>
+<td style="text-align:right;">
+8849.8
+</td>
+<td style="text-align:right;">
+8813.2
+</td>
+<td style="text-align:right;">
+8805.8
+</td>
+<td style="text-align:right;">
+8801.3
+</td>
+<td style="text-align:right;">
+8800.6
+</td>
+<td style="text-align:right;">
+8800.2
+</td>
+<td style="text-align:right;">
+8801.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot5
+</td>
+<td style="text-align:right;">
+9525.9
+</td>
+<td style="text-align:right;">
+8985.4
+</td>
+<td style="text-align:right;">
+8894.0
+</td>
+<td style="text-align:right;">
+8849.5
+</td>
+<td style="text-align:right;">
+8851.4
+</td>
+<td style="text-align:right;">
+8809.1
+</td>
+<td style="text-align:right;">
+8803.7
+</td>
+<td style="text-align:right;">
+8800.0
+</td>
+<td style="text-align:right;">
+8799.1
+</td>
+<td style="text-align:right;">
+8798.9
+</td>
+<td style="text-align:right;">
+8800.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot6
+</td>
+<td style="text-align:right;">
+9527.4
+</td>
+<td style="text-align:right;">
+8987.0
+</td>
+<td style="text-align:right;">
+8895.1
+</td>
+<td style="text-align:right;">
+8851.7
+</td>
+<td style="text-align:right;">
+8853.6
+</td>
+<td style="text-align:right;">
+8810.9
+</td>
+<td style="text-align:right;">
+8804.9
+</td>
+<td style="text-align:right;">
+8801.3
+</td>
+<td style="text-align:right;">
+8800.6
+</td>
+<td style="text-align:right;">
+8800.4
+</td>
+<td style="text-align:right;">
+8801.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot7
+</td>
+<td style="text-align:right;">
+9530.4
+</td>
+<td style="text-align:right;">
+8988.6
+</td>
+<td style="text-align:right;">
+8896.6
+</td>
+<td style="text-align:right;">
+8852.4
+</td>
+<td style="text-align:right;">
+8854.2
+</td>
+<td style="text-align:right;">
+8813.2
+</td>
+<td style="text-align:right;">
+8807.9
+</td>
+<td style="text-align:right;">
+8804.3
+</td>
+<td style="text-align:right;">
+8803.4
+</td>
+<td style="text-align:right;">
+8803.2
+</td>
+<td style="text-align:right;">
+8804.4
+</td>
+</tr>
+</tbody>
+</table>
+<p>The best model is saved within the <code>cd4.best</code> list. The
+key estimates from the best model are:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">knots.m</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">knots.v</span></span>
+<span><span class="co">#&gt; [1] 3</span></span>
+<span></span>
+<span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">mean</span></span>
+<span><span class="co">#&gt;    Intercept M_Knt6_Base1 M_Knt6_Base2 M_Knt6_Base3 M_Knt6_Base4 M_Knt6_Base5 M_Knt6_Base6 </span></span>
+<span><span class="co">#&gt;     32.98833   1597.06078    713.32197    582.58478    472.08281    291.50092    269.24506 </span></span>
+<span><span class="co">#&gt; M_Knt6_Base7 M_Knt6_Base8 </span></span>
+<span><span class="co">#&gt;    220.66235    155.83254</span></span>
+<span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">variance</span></span>
+<span><span class="co">#&gt;    Intercept V_Knt3_Base1 V_Knt3_Base2 V_Knt3_Base3 V_Knt3_Base4 V_Knt3_Base5 </span></span>
+<span><span class="co">#&gt;   40801.4581  411830.6370  109290.5901    2784.9777     914.4245  -25616.3670</span></span></code></pre></div>
+<p>ie. 6 knots in mean and 3 in variance, with parameter estimates as
+given. We can then plot this best model:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotVarReg.html">plotVarReg</a></span><span class="op">(</span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span>,</span>
+<span>           xlab <span class="op">=</span> <span class="st">"Age in years"</span>,</span>
+<span>           ylab <span class="op">=</span> <span class="st">"CD4 cell count"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="varregfig-plotvarreg2-1.png" alt=""><p class="caption">plot of chunk plotvarreg2</p>
+</div>
+<p>From these residuals, there still appears to be deviations from
+normality in the residuals, again seen in both the Q-Q plot and the
+histogram. Therefore the incorporation of a shape parameter should be
+investigated.</p>
+</div>
+<div class="section level3">
+<h3 id="lssvarreg-function">
+<code>lssVarReg</code> function<a class="anchor" aria-label="anchor" href="#lssvarreg-function"></a>
+</h3>
+<p>In order to fit models with a shape parameter, we utilise the
+<code><a href="../reference/lssVarReg.html">lssVarReg()</a></code> function. Firstly, let us fit a constant shape
+parameter with 6 knots in the mean and 3 knots in the variance, that
+is,</p>
+<p>Let us fit two models, one with a constant shape parameter and one
+with a linear model in the shape, with the following code.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">con.shape</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/lssVarReg.html">lssVarReg</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">cd4</span>,</span>
+<span>                     x<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>,</span>
+<span>                     locationmodel<span class="op">=</span><span class="st">"semi"</span>,</span>
+<span>                     knots.l<span class="op">=</span><span class="fl">6</span>,</span>
+<span>                     scale2model<span class="op">=</span><span class="st">"semi"</span>,</span>
+<span>                     knots.sc<span class="op">=</span><span class="fl">3</span>,</span>
+<span>                     mono.scale <span class="op">=</span> <span class="st">"inc"</span>,</span>
+<span>                     shapemodel<span class="op">=</span><span class="st">"constant"</span>,</span>
+<span>                     maxit<span class="op">=</span><span class="fl">1000</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">linear.shape</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/lssVarReg.html">lssVarReg</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">cd4</span>,</span>
+<span>                        x<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>,</span>
+<span>                        locationmodel<span class="op">=</span><span class="st">"semi"</span>,</span>
+<span>                        knots.l<span class="op">=</span><span class="fl">6</span>,</span>
+<span>                        scale2model<span class="op">=</span><span class="st">"semi"</span>,</span>
+<span>                        knots.sc<span class="op">=</span><span class="fl">3</span>,</span>
+<span>                        shapemodel<span class="op">=</span><span class="st">"linear"</span>,</span>
+<span>                        int.maxit<span class="op">=</span><span class="fl">1000</span>,</span>
+<span>                        print.it<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>                        maxit<span class="op">=</span><span class="fl">1000</span> <span class="op">)</span></span></code></pre></div>
+<p>If we want to speed up the model, we can use starting estimates (from
+our best model) and parameter space restrictions, like so for the
+constant model:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">con.shape_faster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lssVarReg.html">lssVarReg</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">cd4</span>, x<span class="op">=</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>,</span>
+<span>                              locationmodel<span class="op">=</span><span class="st">"semi"</span>,</span>
+<span>                              knots.l<span class="op">=</span><span class="fl">6</span>,</span>
+<span>                              scale2model<span class="op">=</span><span class="st">"semi"</span>,</span>
+<span>                              knots.sc<span class="op">=</span><span class="fl">3</span>,</span>
+<span>                              shapemodel<span class="op">=</span><span class="st">"constant"</span>,</span>
+<span>                              para.space<span class="op">=</span><span class="st">"positive"</span>,</span>
+<span>                              location.init <span class="op">=</span> <span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">mean</span>,</span>
+<span>                              scale2.init <span class="op">=</span> <span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">variance</span>,</span>
+<span>                              int.maxit <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>                              maxit<span class="op">=</span><span class="fl">1000</span> <span class="op">)</span></span></code></pre></div>
+<p>And compare the models as we did in the paper:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"No shape"</span>, <span class="st">"Constant shape"</span>, <span class="st">"Linear shape"</span><span class="op">)</span>,</span>
+<span>           AIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">aic</span>, <span class="va">con.shape</span><span class="op">$</span><span class="va">aic</span>, <span class="va">linear.shape</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span>,</span>
+<span>           BIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">bic</span>, <span class="va">con.shape</span><span class="op">$</span><span class="va">bic</span>, <span class="va">linear.shape</span><span class="op">$</span><span class="va">bic</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kbl</span><span class="op">(</span>digits<span class="op">=</span><span class="fl">1</span>,</span>
+<span>      align<span class="op">=</span><span class="st">'c'</span>,</span>
+<span>      caption <span class="op">=</span> <span class="st">"Comparison of AIC from shape models for CD4 cell counts."</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kable_paper</span><span class="op">(</span>full_width <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span></span></code></pre></div>
+<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>
+Comparison of AIC from shape models for CD4 cell counts.
+</caption>
+<thead><tr>
+<th style="text-align:center;">
+Model
+</th>
+<th style="text-align:center;">
+AIC
+</th>
+<th style="text-align:center;">
+BIC
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+No shape
+</td>
+<td style="text-align:center;">
+8795.6
+</td>
+<td style="text-align:center;">
+8861.8
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+Constant shape
+</td>
+<td style="text-align:center;">
+8697.7
+</td>
+<td style="text-align:center;">
+8768.3
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+Linear shape
+</td>
+<td style="text-align:center;">
+8687.1
+</td>
+<td style="text-align:center;">
+8762.1
+</td>
+</tr>
+</tbody>
+</table>
+<p>And compare the residuals:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">n</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span><span class="op">)</span></span>
+<span><span class="va">knot6</span><span class="op">&lt;-</span><span class="fu">bs</span><span class="op">(</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>, df<span class="op">=</span> <span class="fl">8</span>, degree<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">knot3</span><span class="op">&lt;-</span><span class="fu">bs</span><span class="op">(</span><span class="va">CD4</span><span class="op">$</span><span class="va">age</span>, df<span class="op">=</span> <span class="fl">5</span>, degree<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##normal model</span></span>
+<span><span class="va">npred.mean</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">n</span><span class="op">)</span>,<span class="va">knot6</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span><span class="va">npred.var</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">n</span><span class="op">)</span>,<span class="va">knot3</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">variance</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">stand.res</span><span class="op">&lt;-</span> <span class="op">(</span><span class="va">CD4</span><span class="op">$</span><span class="va">cd4</span><span class="op">-</span><span class="va">npred.mean</span><span class="op">)</span><span class="op">**</span><span class="fl">2</span><span class="op">/</span><span class="op">(</span><span class="va">npred.var</span><span class="op">)</span></span>
+<span><span class="va">chiq</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html" class="external-link">qchisq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="va">n</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, df<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#constant residuals</span></span>
+<span><span class="va">con.res</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/lss_calc.html">lss_calc</a></span><span class="op">(</span><span class="va">con.shape</span><span class="op">)</span></span>
+<span><span class="va">con.res</span><span class="op">&lt;-</span><span class="va">con.res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">con.res</span><span class="op">$</span><span class="va">CD4.age</span><span class="op">)</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="co">#linear residuals</span></span>
+<span><span class="va">lin.res</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/lss_calc.html">lss_calc</a></span><span class="op">(</span><span class="va">linear.shape</span><span class="op">)</span></span>
+<span><span class="va">lin.res</span><span class="op">&lt;-</span><span class="va">lin.res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">lin.res</span><span class="op">$</span><span class="va">CD4.age</span><span class="op">)</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">chiq</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">stand.res</span><span class="op">)</span>, main<span class="op">=</span><span class="cn">NULL</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>, pch<span class="op">=</span><span class="fl">19</span>, ylab<span class="op">=</span><span class="st">"Squared standardised residuals after fit with no shape"</span>, xlab<span class="op">=</span><span class="st">"Chi-Square(1) quantiles"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">'A'</span>, side<span class="op">=</span><span class="fl">3</span>, line<span class="op">=</span><span class="fl">2</span>, at<span class="op">=</span><span class="fl">0</span>, adj<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">chiq</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">con.res</span><span class="op">$</span><span class="va">stand.res2</span><span class="op">)</span>, main<span class="op">=</span><span class="cn">NULL</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,pch<span class="op">=</span><span class="fl">19</span>, ylab<span class="op">=</span><span class="st">"Squared standardised residuals after LSS (constant) fit"</span>, xlab<span class="op">=</span><span class="st">"Chi-Square(1) quantiles"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">'B'</span>, side<span class="op">=</span><span class="fl">3</span>, line<span class="op">=</span><span class="fl">2</span>, at<span class="op">=</span><span class="fl">0</span>, adj<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">chiq</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">lin.res</span><span class="op">$</span><span class="va">stand.res2</span><span class="op">)</span>, main<span class="op">=</span><span class="cn">NULL</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,pch<span class="op">=</span><span class="fl">19</span>, ylab<span class="op">=</span><span class="st">"Squared standardised residuals after LSS (linear) fit"</span>, xlab<span class="op">=</span><span class="st">"Chi-Square(1) quantiles"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">'C'</span>, side<span class="op">=</span><span class="fl">3</span>, line<span class="op">=</span><span class="fl">2</span>, at<span class="op">=</span><span class="fl">0</span>, adj<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="varregfig-resp-1.png" alt=""><p class="caption">plot of chunk resp</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="viral-load-dataset-censored-outcome-data">Viral load dataset (censored outcome data)<a class="anchor" aria-label="anchor" href="#viral-load-dataset-censored-outcome-data"></a>
+</h2>
+<p>This is a dataset of the HIV viral load (blood concentration of HIV
+RNA on a log10 scale) measured in 257 participants. Prior to commencing
+a clinical trial, participants had their blood assayed twice during a
+short period of time. Although the underlying viral load is unchanged in
+this time, the readings will differ due to measurement error. Another
+important aspect is that measurements cannot be detected below a
+particular assay limit, in this case, 2.70.</p>
+<p>Lets plot the data:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">rna</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Mean viral load"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">ylab</span><span class="op">(</span><span class="st">"Difference in viral load"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="varregfig-viralp-1.png" alt=""><p class="caption">plot of chunk viralp</p>
+</div>
+<p>Now let us search for the optimal knots, using the censoring
+indicator and</p>
+<p>Monotonic decreasing model:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rna.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/searchVarReg.html">searchVarReg</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">rna</span><span class="op">$</span><span class="va">y</span>,</span>
+<span>                         x<span class="op">=</span><span class="va">rna</span><span class="op">$</span><span class="va">x</span>,</span>
+<span>                         maxknots.m <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                         maxknots.v <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                         mono.var <span class="op">=</span> <span class="st">"dec"</span>,</span>
+<span>                         selection<span class="op">=</span><span class="st">"AIC"</span>,</span>
+<span>                         maxit<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<p>AIC from all models:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rna.best</span><span class="op">$</span><span class="va">AIC</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kbl</span><span class="op">(</span>digits<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean_zero
+</th>
+<th style="text-align:right;">
+Mean_constant
+</th>
+<th style="text-align:right;">
+Mean_linear
+</th>
+<th style="text-align:right;">
+Mean_Knot0
+</th>
+<th style="text-align:right;">
+Mean_Knot1
+</th>
+<th style="text-align:right;">
+Mean_Knot2
+</th>
+<th style="text-align:right;">
+Mean_Knot3
+</th>
+<th style="text-align:right;">
+Mean_Knot4
+</th>
+<th style="text-align:right;">
+Mean_Knot5
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Var_constant
+</td>
+<td style="text-align:right;">
+356.6
+</td>
+<td style="text-align:right;">
+358.6
+</td>
+<td style="text-align:right;">
+360.7
+</td>
+<td style="text-align:right;">
+362.4
+</td>
+<td style="text-align:right;">
+364.4
+</td>
+<td style="text-align:right;">
+366.8
+</td>
+<td style="text-align:right;">
+367.6
+</td>
+<td style="text-align:right;">
+368.0
+</td>
+<td style="text-align:right;">
+370.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_linear
+</td>
+<td style="text-align:right;">
+343.7
+</td>
+<td style="text-align:right;">
+345.0
+</td>
+<td style="text-align:right;">
+346.6
+</td>
+<td style="text-align:right;">
+343.8
+</td>
+<td style="text-align:right;">
+346.0
+</td>
+<td style="text-align:right;">
+346.8
+</td>
+<td style="text-align:right;">
+348.2
+</td>
+<td style="text-align:right;">
+349.7
+</td>
+<td style="text-align:right;">
+351.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot0
+</td>
+<td style="text-align:right;">
+308.8
+</td>
+<td style="text-align:right;">
+310.4
+</td>
+<td style="text-align:right;">
+312.4
+</td>
+<td style="text-align:right;">
+314.0
+</td>
+<td style="text-align:right;">
+314.7
+</td>
+<td style="text-align:right;">
+316.5
+</td>
+<td style="text-align:right;">
+318.5
+</td>
+<td style="text-align:right;">
+319.1
+</td>
+<td style="text-align:right;">
+321.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot1
+</td>
+<td style="text-align:right;">
+301.4
+</td>
+<td style="text-align:right;">
+303.1
+</td>
+<td style="text-align:right;">
+305.0
+</td>
+<td style="text-align:right;">
+306.8
+</td>
+<td style="text-align:right;">
+307.9
+</td>
+<td style="text-align:right;">
+309.2
+</td>
+<td style="text-align:right;">
+311.5
+</td>
+<td style="text-align:right;">
+311.8
+</td>
+<td style="text-align:right;">
+313.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot2
+</td>
+<td style="text-align:right;">
+300.2
+</td>
+<td style="text-align:right;">
+301.7
+</td>
+<td style="text-align:right;">
+303.7
+</td>
+<td style="text-align:right;">
+305.3
+</td>
+<td style="text-align:right;">
+306.4
+</td>
+<td style="text-align:right;">
+308.0
+</td>
+<td style="text-align:right;">
+310.2
+</td>
+<td style="text-align:right;">
+310.3
+</td>
+<td style="text-align:right;">
+312.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot3
+</td>
+<td style="text-align:right;">
+300.9
+</td>
+<td style="text-align:right;">
+302.6
+</td>
+<td style="text-align:right;">
+304.5
+</td>
+<td style="text-align:right;">
+306.0
+</td>
+<td style="text-align:right;">
+307.2
+</td>
+<td style="text-align:right;">
+308.8
+</td>
+<td style="text-align:right;">
+310.9
+</td>
+<td style="text-align:right;">
+311.0
+</td>
+<td style="text-align:right;">
+312.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot4
+</td>
+<td style="text-align:right;">
+302.5
+</td>
+<td style="text-align:right;">
+304.2
+</td>
+<td style="text-align:right;">
+306.0
+</td>
+<td style="text-align:right;">
+307.7
+</td>
+<td style="text-align:right;">
+308.7
+</td>
+<td style="text-align:right;">
+310.2
+</td>
+<td style="text-align:right;">
+312.4
+</td>
+<td style="text-align:right;">
+312.5
+</td>
+<td style="text-align:right;">
+314.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot5
+</td>
+<td style="text-align:right;">
+301.9
+</td>
+<td style="text-align:right;">
+303.5
+</td>
+<td style="text-align:right;">
+305.5
+</td>
+<td style="text-align:right;">
+306.8
+</td>
+<td style="text-align:right;">
+307.9
+</td>
+<td style="text-align:right;">
+309.6
+</td>
+<td style="text-align:right;">
+311.8
+</td>
+<td style="text-align:right;">
+312.1
+</td>
+<td style="text-align:right;">
+313.8
+</td>
+</tr>
+</tbody>
+</table>
+<p>Find the smallest AIC:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">rna.best</span><span class="op">$</span><span class="va">AIC</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 300.1673</span></span></code></pre></div>
+<p>Allows increasing and decreasing:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rna.best2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/searchVarReg.html">searchVarReg</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">rna</span><span class="op">$</span><span class="va">y</span>,</span>
+<span>                          x<span class="op">=</span><span class="va">rna</span><span class="op">$</span><span class="va">x</span>,</span>
+<span>                          cens.ind <span class="op">=</span> <span class="va">rna</span><span class="op">$</span><span class="va">cc</span>,</span>
+<span>                          maxknots.m <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                          maxknots.v <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                          selection<span class="op">=</span><span class="st">"AIC"</span>,</span>
+<span>                          maxit<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<p>AIC from all models:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rna.best2</span><span class="op">$</span><span class="va">AIC</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kbl</span><span class="op">(</span>digits<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean_zero
+</th>
+<th style="text-align:right;">
+Mean_constant
+</th>
+<th style="text-align:right;">
+Mean_linear
+</th>
+<th style="text-align:right;">
+Mean_Knot0
+</th>
+<th style="text-align:right;">
+Mean_Knot1
+</th>
+<th style="text-align:right;">
+Mean_Knot2
+</th>
+<th style="text-align:right;">
+Mean_Knot3
+</th>
+<th style="text-align:right;">
+Mean_Knot4
+</th>
+<th style="text-align:right;">
+Mean_Knot5
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Var_constant
+</td>
+<td style="text-align:right;">
+356.6
+</td>
+<td style="text-align:right;">
+358.6
+</td>
+<td style="text-align:right;">
+360.7
+</td>
+<td style="text-align:right;">
+362.4
+</td>
+<td style="text-align:right;">
+364.4
+</td>
+<td style="text-align:right;">
+366.8
+</td>
+<td style="text-align:right;">
+367.6
+</td>
+<td style="text-align:right;">
+368.0
+</td>
+<td style="text-align:right;">
+370.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_linear
+</td>
+<td style="text-align:right;">
+343.7
+</td>
+<td style="text-align:right;">
+345.0
+</td>
+<td style="text-align:right;">
+346.6
+</td>
+<td style="text-align:right;">
+343.8
+</td>
+<td style="text-align:right;">
+346.0
+</td>
+<td style="text-align:right;">
+346.8
+</td>
+<td style="text-align:right;">
+348.2
+</td>
+<td style="text-align:right;">
+349.7
+</td>
+<td style="text-align:right;">
+351.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot0
+</td>
+<td style="text-align:right;">
+364.6
+</td>
+<td style="text-align:right;">
+366.1
+</td>
+<td style="text-align:right;">
+368.0
+</td>
+<td style="text-align:right;">
+365.0
+</td>
+<td style="text-align:right;">
+367.1
+</td>
+<td style="text-align:right;">
+368.3
+</td>
+<td style="text-align:right;">
+369.6
+</td>
+<td style="text-align:right;">
+371.0
+</td>
+<td style="text-align:right;">
+373.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot1
+</td>
+<td style="text-align:right;">
+323.2
+</td>
+<td style="text-align:right;">
+325.1
+</td>
+<td style="text-align:right;">
+327.0
+</td>
+<td style="text-align:right;">
+327.6
+</td>
+<td style="text-align:right;">
+329.2
+</td>
+<td style="text-align:right;">
+330.9
+</td>
+<td style="text-align:right;">
+333.1
+</td>
+<td style="text-align:right;">
+332.9
+</td>
+<td style="text-align:right;">
+334.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot2
+</td>
+<td style="text-align:right;">
+299.4
+</td>
+<td style="text-align:right;">
+300.7
+</td>
+<td style="text-align:right;">
+302.6
+</td>
+<td style="text-align:right;">
+303.1
+</td>
+<td style="text-align:right;">
+304.2
+</td>
+<td style="text-align:right;">
+306.1
+</td>
+<td style="text-align:right;">
+308.1
+</td>
+<td style="text-align:right;">
+308.1
+</td>
+<td style="text-align:right;">
+309.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot3
+</td>
+<td style="text-align:right;">
+299.9
+</td>
+<td style="text-align:right;">
+301.3
+</td>
+<td style="text-align:right;">
+303.2
+</td>
+<td style="text-align:right;">
+303.6
+</td>
+<td style="text-align:right;">
+304.8
+</td>
+<td style="text-align:right;">
+306.6
+</td>
+<td style="text-align:right;">
+308.6
+</td>
+<td style="text-align:right;">
+308.6
+</td>
+<td style="text-align:right;">
+310.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot4
+</td>
+<td style="text-align:right;">
+300.4
+</td>
+<td style="text-align:right;">
+302.0
+</td>
+<td style="text-align:right;">
+303.8
+</td>
+<td style="text-align:right;">
+304.0
+</td>
+<td style="text-align:right;">
+304.8
+</td>
+<td style="text-align:right;">
+306.5
+</td>
+<td style="text-align:right;">
+308.7
+</td>
+<td style="text-align:right;">
+308.7
+</td>
+<td style="text-align:right;">
+310.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot5
+</td>
+<td style="text-align:right;">
+301.5
+</td>
+<td style="text-align:right;">
+303.0
+</td>
+<td style="text-align:right;">
+304.9
+</td>
+<td style="text-align:right;">
+304.7
+</td>
+<td style="text-align:right;">
+305.7
+</td>
+<td style="text-align:right;">
+307.7
+</td>
+<td style="text-align:right;">
+309.7
+</td>
+<td style="text-align:right;">
+310.4
+</td>
+<td style="text-align:right;">
+311.9
+</td>
+</tr>
+</tbody>
+</table>
+<p>Smallest AIC:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">rna.best2</span><span class="op">$</span><span class="va">AIC</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 299.3517</span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
