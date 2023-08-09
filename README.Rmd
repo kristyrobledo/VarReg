@@ -11,138 +11,46 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
-library(badger)
 ```
 
 # VarReg
 
 <!-- badges: start -->
-`r badge_cran_release("VarReg", "orange")` 
-`r badge_devel("kristyrobledo/VarReg", "blue")`
-`r badge_cran_download("VarReg", "grand-total", "blue")`
-`r badge_cran_download("VarReg", "last-month", "green")`
-`r badge_cran_download("VarReg", "last-week", "yellow")`
+[![CRAN status](https://www.r-pkg.org/badges/version/VarReg)](https://CRAN.R-project.org/package=VarReg)
 <!-- badges: end -->
 
-<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
+The goal of VarReg is to ...
 
-<!-- display the social media buttons in your README -->
+## Installation
 
-<!--[![alt text][1.1]][1] -->
-
-
-
-<!-- links to social media icons -->
-<!-- no need to change these -->
-
-<!-- icons with padding -->
-
-[1.1]: http://i.imgur.com/tXSoThF.png (twitter icon with padding)
-[2.1]: http://i.imgur.com/P3YfQoD.png (facebook icon with padding)
-[3.1]: http://i.imgur.com/yCsTjba.png (google plus icon with padding)
-[4.1]: http://i.imgur.com/YckIOms.png (tumblr icon with padding)
-[5.1]: http://i.imgur.com/1AGmwO3.png (dribbble icon with padding)
-[6.1]: http://i.imgur.com/0o48UoR.png (github icon with padding)
-
-<!-- icons without padding -->
-
-[1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
-[2.2]: http://i.imgur.com/fep1WsG.png (facebook icon without padding)
-[3.2]: http://i.imgur.com/VlgBKQ9.png (google plus icon without padding)
-[4.2]: http://i.imgur.com/jDRp47c.png (tumblr icon without padding)
-[5.2]: http://i.imgur.com/Vvy3Kru.png (dribbble icon without padding)
-[6.2]: http://i.imgur.com/9I6NRUm.png (github icon without padding)
-
-
-<!-- links to your social media accounts -->
-<!-- update these accordingly -->
-
-
-<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
-
-The goal of VarReg is to provide methods for fitting semi-parametric mean and variance models, with normal or censored data. This has also been extended to allow a regression in the location, scale and shape parameters.
-This algorithm is based upon an EM (Expectation Maximisation) algorithm, so is more stable than other similar methods like GAMLSS.
-
-There is a algorithm paper published:
-Robledo, K.P., Marschner, I.C. A new algorithm for fitting semi-parametric variance regression models. Comput Stat 36, 2313–2335 (2021). <https://doi.org/10.1007/s00180-021-01067-6>
-
-## :raising_hand: Author
-
-Kristy Robledo <https://github.com/kristyrobledo>
-
-NHMRC Clinical Trials Centre, University of Sydney
-
-
-## :arrow_double_down: Installation
-
-You can install the released version of VarReg from [CRAN](https://CRAN.R-project.org) with:
+You can install the development version of VarReg from [GitHub](https://github.com/) with:
 
 ``` r
-install.packages("VarReg")
+# install.packages("devtools")
+devtools::install_github("kristyrobledo/VarReg")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+## Example
 
-``` r
-remotes::install_github("kristyrobledo/VarReg")
-```
-## :book: Examples
-
-For more examples, see this repository [https://github.com/kristyrobledo/VarReg-paper-code](https://github.com/kristyrobledo/VarReg-paper-code)
- which is based on providing the code from a draft software paper here [https://github.com/kristyrobledo/VarReg-paper](https://github.com/kristyrobledo/VarReg-paper). 
- 
-This is a basic example to read in the mcycle dataset and perform a linear model in the mean and the variance:
+This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(VarReg)
-## read in dataset
-data(mcycle)
-## run a model with linear mean and linear variance:
-linmodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="linear", varmodel="linear",
-  maxit=10000)
-
+## basic example code
 ```
 
-Now we can plot the model:
+What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
 
-```{r plotlinear}
-plotVarReg(linmodel)
-
-
-##can also add CI
-plotVarReg(linmodel, ci=TRUE, ci.type = "im")
+```{r cars}
+summary(cars)
 ```
 
-Or we can look at the results:
-```{r seelin}
-linmodel$loglik
+You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
 
-linmodel$mean
+You can also embed plots, for example:
 
-linmodel$variance
+```{r pressure, echo = FALSE}
+plot(pressure)
 ```
 
-We can also run a model with semi-parametric mean (4 internal knots) and semi-parametric variance (2 knots):
-
-```{r semimodel}
-semimodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
-knots.m=4, knots.v=2, maxit=10000)
-plotVarReg(semimodel)
-
-## run a model with semi-parametric mean (4 internal knots) and semi-parametric monotonic
-## variance (2 knots):
-## not run
-##semimodel_inc<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
-##knots.m=4, knots.v=2, mono.var="inc")
-```
-
-Lastly, we can fit a model with a model in the location, scale and shape. Im not going to run this, just show the code, as it takes a while to run on my laptop!
-
-```{r lss}
- ##  LSS model followed by the basic plot command
-#lssmodel<-lssVarReg(mcycle$accel, mcycle$times,  locationmodel="linear", scale2model="linear", shapemodel="constant", maxit=10000)
-#plotlssVarReg(lssmodel, xlab="Time in seconds", ylab="Acceleration")
-```
-
-Enjoy!
-
+In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

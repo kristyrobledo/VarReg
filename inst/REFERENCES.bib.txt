@@ -1,0 +1,15 @@
+@article{robledo2021,
+   author = {Robledo, Kristy P. and Marschner, Ian C.},
+   title = {A new algorithm for fitting semi-parametric variance regression models},
+   journal = {Computational Statistics},
+   volume = {36},
+   number = {4},
+   pages = {2313-2335},
+   abstract = {Variance regression allows for heterogeneous variance, or heteroscedasticity, by incorporating a regression model into the variance. This paper uses a variant of the expectation–maximisation algorithm to develop a new method for fitting additive variance regression models that allow for regression in both the mean and the variance. The algorithm is easily extended to allow for B-spline bases, thus allowing for the incorporation of a semi-parametric model in both the mean and variance. Although there are existing methods to fit these types of models, this new algorithm provides a reliable alternative approach that is not susceptible to numerical instability that can arise in this constrained estimation context. We utilise the developed algorithm with a series of simulation studies and analyse illustrative data. Various simulation studies show that the algorithm can recover the true model for a variety of scenarios. We also study automatic selection of model complexity based on information-based criteria, and show that the Akaike information criterion is useful for choosing the optimal number of knots in a B-spline model. An R package is available for implementing these methods.},
+   ISSN = {1613-9658},
+   DOI = {10.1007/s00180-021-01067-6},
+   url = {https://doi.org/10.1007/s00180-021-01067-6},
+   year = {2021},
+   type = {Journal Article}
+}
+

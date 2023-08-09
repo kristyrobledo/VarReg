@@ -5,23 +5,9 @@
 
 <!-- badges: start -->
 
-[![](https://www.r-pkg.org/badges/version/VarReg?color=orange)](https://cran.r-project.org/package=VarReg)
-[![](https://img.shields.io/badge/devel%20version-2.0.1-blue.svg)](https://github.com/kristyrobledo/VarReg)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/VarReg?color=blue)](https://cran.r-project.org/package=VarReg)
-[![](http://cranlogs.r-pkg.org/badges/last-month/VarReg?color=green)](https://cran.r-project.org/package=VarReg)
-[![](http://cranlogs.r-pkg.org/badges/last-week/VarReg?color=yellow)](https://cran.r-project.org/package=VarReg)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/VarReg)](https://CRAN.R-project.org/package=VarReg)
 <!-- badges: end -->
-
-<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
-<!-- display the social media buttons in your README -->
-<!--[![alt text][1.1]][1] -->
-<!-- links to social media icons -->
-<!-- no need to change these -->
-<!-- icons with padding -->
-<!-- icons without padding -->
-<!-- links to your social media accounts -->
-<!-- update these accordingly -->
-<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
 The goal of VarReg is to provide methods for fitting semi-parametric
 mean and variance models, with normal or censored data. This has also
