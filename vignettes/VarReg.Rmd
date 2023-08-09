@@ -12,11 +12,11 @@ vignette: >
 
 
 
-This repository is for the data and code presented in the paper published here (to be added). 
+This repository is for the data and code presented in the paper published here (to be added).
 
 ## Install packages
 
-Firstly, you will need to install the `VarReg` package and a few others to perform the code below. 
+Firstly, you will need to install the `VarReg` package and a few others to perform the code below.
 
 
 ```r
@@ -54,7 +54,7 @@ ggplot(data=CD4, aes(y=cd4, x=age)) +
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk cd4p1](varregfig-cd4p1-1.png)
 
 ### Linear model in mean and variance
 
@@ -63,10 +63,10 @@ Let us fit a linear model in the mean and variance model, like so
 
 
 ```r
-cd4.linear<-semiVarReg(y = CD4$cd4, 
-                       x=CD4$age, 
-                       meanmodel = "linear", 
-                       varmodel = "linear", 
+cd4.linear<-semiVarReg(y = CD4$cd4,
+                       x=CD4$age,
+                       meanmodel = "linear",
+                       varmodel = "linear",
                        maxit=10000)
 ```
 
@@ -99,7 +99,7 @@ cd4.linear$variance
 plotVarReg(cd4.linear, xlab = "Age in years", ylab = "CD4 cell count")
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk plotcd4](varregfig-plotcd4-1.png)
 
 ### Searching for the optimal spline
 
@@ -109,12 +109,12 @@ Searching to a max of 7 knots in the mean and variance, with maximum iterations 
 
 
 ```r
-cd4.best <- searchVarReg(y=CD4$cd4, 
-                         x=CD4$age, 
-                         maxknots.m = 7, 
-                         maxknots.v = 7, 
-                         selection="AIC", 
-                         maxit=100) 
+cd4.best <- searchVarReg(y=CD4$cd4,
+                         x=CD4$age,
+                         maxknots.m = 7,
+                         maxknots.v = 7,
+                         selection="AIC",
+                         maxit=100)
 ```
 
 
@@ -309,22 +309,22 @@ cd4.best$best.model$variance
 #>   40801.4581  411830.6370  109290.5901    2784.9777     914.4245  -25616.3670
 ```
 
-ie. 6 knots in mean and 3 in variance, with parameter estimates as given. 
+ie. 6 knots in mean and 3 in variance, with parameter estimates as given.
 We can then plot this best model:
 
 
 ```r
-plotVarReg(cd4.best$best.model, 
-           xlab = "Age in years", 
+plotVarReg(cd4.best$best.model,
+           xlab = "Age in years",
            ylab = "CD4 cell count")
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![plot of chunk plotvarreg2](varregfig-plotvarreg2-1.png)
 
 From these residuals, there still appears to be deviations from
 normality in the residuals, again seen in both the Q-Q plot and the
 histogram. Therefore the incorporation of a shape parameter should be
-investigated. 
+investigated.
 
 ### `lssVarReg` function
 
@@ -340,39 +340,39 @@ a linear model in the shape, with the following code.
 
 
 ```r
-con.shape<-lssVarReg(y=CD4$cd4, 
-                     x=CD4$age, 
-                     locationmodel="semi", 
-                     knots.l=6, 
-                     scale2model="semi", 
-                     knots.sc=3, 
-                     mono.scale = "inc", 
-                     shapemodel="constant",   
+con.shape<-lssVarReg(y=CD4$cd4,
+                     x=CD4$age,
+                     locationmodel="semi",
+                     knots.l=6,
+                     scale2model="semi",
+                     knots.sc=3,
+                     mono.scale = "inc",
+                     shapemodel="constant",
                      maxit=1000 )
 
-linear.shape<-lssVarReg(y=CD4$cd4, 
-                        x=CD4$age, 
-                        locationmodel="semi", 
-                        knots.l=6, 
-                        scale2model="semi", 
-                        knots.sc=3,  
-                        shapemodel="linear", 
-                        int.maxit=1000, 
-                        print.it=TRUE, 
+linear.shape<-lssVarReg(y=CD4$cd4,
+                        x=CD4$age,
+                        locationmodel="semi",
+                        knots.l=6,
+                        scale2model="semi",
+                        knots.sc=3,
+                        shapemodel="linear",
+                        int.maxit=1000,
+                        print.it=TRUE,
                         maxit=1000 )
 ```
 
 If we want to speed up the model, we can use starting estimates (from our best model) and parameter space restrictions, like so for the constant model:
 
 ```r
-con.shape_faster <- lssVarReg(y=CD4$cd4, x=CD4$age, 
-                              locationmodel="semi", 
-                              knots.l=6, 
-                              scale2model="semi", 
-                              knots.sc=3,  
-                              shapemodel="constant",  
-                              para.space="positive", 
-                              location.init = cd4.best$best.model$mean, 
+con.shape_faster <- lssVarReg(y=CD4$cd4, x=CD4$age,
+                              locationmodel="semi",
+                              knots.l=6,
+                              scale2model="semi",
+                              knots.sc=3,
+                              shapemodel="constant",
+                              para.space="positive",
+                              location.init = cd4.best$best.model$mean,
                               scale2.init = cd4.best$best.model$variance,
                               int.maxit = 10000,
                               maxit=1000 )
@@ -383,13 +383,13 @@ And compare the models as we did in the paper:
 
 
 ```r
-data.frame(Model = c("No shape", "Constant shape", "Linear shape"), 
-           AIC = c(cd4.best$best.model$aic, con.shape$aic, linear.shape$aic), 
-           BIC = c(cd4.best$best.model$bic, con.shape$bic, linear.shape$bic)) %>% 
-  kbl(digits=1, 
-      align='c', 
+data.frame(Model = c("No shape", "Constant shape", "Linear shape"),
+           AIC = c(cd4.best$best.model$aic, con.shape$aic, linear.shape$aic),
+           BIC = c(cd4.best$best.model$bic, con.shape$bic, linear.shape$bic)) %>%
+  kbl(digits=1,
+      align='c',
       caption = "Comparison of AIC from shape models for CD4 cell counts.") %>%
-  kable_paper(full_width = TRUE ) 
+  kable_paper(full_width = TRUE )
 ```
 
 <table class=" lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
@@ -459,7 +459,7 @@ abline(0,1)
 mtext('C', side=3, line=2, at=0, adj=3)
 ```
 
-![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png)
+![plot of chunk resp](varregfig-resp-1.png)
 
 
 ## Viral load dataset (censored outcome data)
@@ -470,10 +470,10 @@ clinical trial, participants had their blood assayed twice during a
 short period of time. Although the underlying viral load is
 unchanged in this time, the readings will differ due to measurement
 error. Another important aspect is that measurements cannot be detected
-below a particular assay limit, in this case, 2.70. 
+below a particular assay limit, in this case, 2.70.
 
 Lets plot the data:
-  
+
 
 ```r
 ggplot(rna, aes(x=x, y=y))+
@@ -484,24 +484,24 @@ ggplot(rna, aes(x=x, y=y))+
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
+![plot of chunk viralp](varregfig-viralp-1.png)
 
-Now let us search for the optimal knots, using the censoring indicator and 
+Now let us search for the optimal knots, using the censoring indicator and
 
 
 
 
 Monotonic decreasing model:
-  
+
 
 ```r
-rna.best <- searchVarReg(y=rna$y, 
-                         x=rna$x, 
-                         maxknots.m = 5, 
+rna.best <- searchVarReg(y=rna$y,
+                         x=rna$x,
+                         maxknots.m = 5,
                          maxknots.v = 5,
-                         mono.var = "dec",  
-                         selection="AIC", 
-                         maxit=1000)  
+                         mono.var = "dec",
+                         selection="AIC",
+                         maxit=1000)
 ```
 
 AIC from all models:
@@ -638,15 +638,15 @@ min(rna.best$AIC)
 ```
 
 Allows increasing and decreasing:
-  
+
 
 ```r
-rna.best2 <- searchVarReg(y=rna$y, 
-                          x=rna$x, 
+rna.best2 <- searchVarReg(y=rna$y,
+                          x=rna$x,
                           cens.ind = rna$cc,
-                          maxknots.m = 5, 
+                          maxknots.m = 5,
                           maxknots.v = 5,
-                          selection="AIC", 
+                          selection="AIC",
                           maxit=1000)
 ```
 
