@@ -1,19 +1,383 @@
 ---
-title: "VarReg"
+title: "VarReg: Basic usage"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{VarReg}
+  %\VignetteIndexEntry{VarReg: Basic usage}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  echo=TRUE,
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup}
+
+This repository is for the data and code presented in the paper published here (to be added). 
+
+## Install packages
+
+Firstly, you will need to install the `VarReg` package and a few others to perform the code below. 
+
+```{r cars, message=FALSE}
 library(VarReg)
+library(gamlss) #for the CD4 dataset
+library(tidyverse)
+library(kableExtra)
+rna<-read.csv(file="rna.csv") #load rna dataset
 ```
+
+## CD4 dataset
+
+This dataset is located within the `gamlss` package. CD4 is a type of white blood cell, and in this dataset, it has been measured in uninfected children born from HIV-1 infected women. The dataset contains 609 measurements of CD4 cell counts
+and the child's age at which the measurements were taken.
+
+```{r}
+
+data("CD4")
+
+str(CD4)
+```
+
+Lets reproduce the graphic in the paper, showing that at younger ages there is more variation in the CD4 counts than at older ages, demonstrating heteroscedasticity.
+
+```{r}
+ggplot(data=CD4, aes(y=cd4, x=age)) +
+  geom_point()+
+  xlab("Age of child in years")+
+  ylab("CD4 cell count")+
+  theme_minimal()
+```
+
+### Linear model in mean and variance
+
+Let us fit a linear model in the mean and variance model, like so
+
+
+```{r}
+cd4.linear<-semiVarReg(y = CD4$cd4, 
+                       x=CD4$age, 
+                       meanmodel = "linear", 
+                       varmodel = "linear", 
+                       maxit=10000)
+```
+
+key outputs for model fit:
+
+```{r}
+cd4.linear$aic
+cd4.linear$bic
+```
+
+Key estimates from model:
+
+```{r}
+cd4.linear$mean
+cd4.linear$variance
+```
+
+### Visualise the model with `plotVarReg` function:
+
+```{r, fig.dim=c(6,6)}
+plotVarReg(cd4.linear, xlab = "Age in years", ylab = "CD4 cell count")
+```
+
+### Searching for the optimal spline
+
+Searching to a max of 7 knots in the mean and variance, with maximum iterations (`maxit`) of 100 to minimise time taken for the search:
+
+```{r, echo=FALSE}
+if (file.exists("results.rds")) {
+  cd4.best <- readRDS("results.rds")
+
+} else {
+
+  # create the results dataset -> now using the saved code as time consuming
+  cd4.best <- searchVarReg(y=CD4$cd4, 
+                           x=CD4$age, 
+                           maxknots.m = 7, 
+                           maxknots.v = 7, 
+                           selection="AIC", 
+                           maxit=100)  #time-consuming function so not 1000 
+  saveRDS(cd4.best, "results.rds")
+}
+```
+
+```{r, eval=FALSE}
+cd4.best <- searchVarReg(y=CD4$cd4, 
+                         x=CD4$age, 
+                         maxknots.m = 7, 
+                         maxknots.v = 7, 
+                         selection="AIC", 
+                         maxit=100) 
+```
+
+
+lets look at the AIC table to identify where the best model is located:
+
+```{r}
+cd4.best$AIC %>%
+  kbl(digits=1)
+```
+
+The best model is saved within the `cd4.best` list. The key estimates from the best model are:
+
+
+```{r}
+cd4.best$best.model$knots.m
+cd4.best$best.model$knots.v
+
+cd4.best$best.model$mean
+cd4.best$best.model$variance
+```
+
+ie. 6 knots in mean and 3 in variance, with parameter estimates as given. 
+We can then plot this best model:
+
+```{r, fig.dim=c(6,6)}
+plotVarReg(cd4.best$best.model, 
+           xlab = "Age in years", 
+           ylab = "CD4 cell count")
+```
+
+From these residuals, there still appears to be deviations from
+normality in the residuals, again seen in both the Q-Q plot and the
+histogram. Therefore the incorporation of a shape parameter should be
+investigated. 
+
+### `lssVarReg` function
+
+In order to fit models with a shape parameter, we utilise
+the `lssVarReg()` function. Firstly, let us fit a constant shape parameter
+with 6 knots in the mean and 3 knots in the variance, that is,
+
+
+```{r, echo=FALSE}
+#$Y_i \sim SN\left(\xi_0+\sum\limits_{p=1}^8 \xi_p s_{ip}, \omega_0+\sum\limits_{q=1}^6 \omega_q l_{iq}, \nu_0 \right), ~~~ i=1,2,...,609$
+#where $s_{ip}$ are the B-spline basis functions ($p=1,2,...,8$) for six
+#knots and $l_{ip}$ are the B-spline basis functions ($q=1,2,...,6$) for
+#three knots, both based upon age in years.
+
+if (file.exists("results_con.rds")) {
+  con.shape <- readRDS("results_con.rds")
+
+
+} else {
+  con.shape <- lssVarReg(y=CD4$cd4, x=CD4$age, 
+                locationmodel="semi", knots.l=6, 
+                scale2model="semi", knots.sc=3,  
+                shapemodel="constant",  
+                para.space="positive",
+                location.init = cd4.best$best.model$mean, 
+                scale2.init = cd4.best$best.model$variance,
+                int.maxit = 10000,
+                maxit=1000 )  #time-consuming function
+  saveRDS(con.shape, "results_con.rds")
+}
+
+if (file.exists("results_lin.rds")) {
+  linear.shape <- readRDS("results_lin.rds")
+} else {
+  linear.shape <- lssVarReg(y=CD4$cd4, x=CD4$age, 
+                locationmodel="semi", knots.l=6, 
+                scale2model="semi", knots.sc=3,  
+                shapemodel="linear",   
+                para.space="positive",
+                location.init = cd4.best$best.model$mean, 
+                scale2.init = cd4.best$best.model$variance,
+                maxit=1000 )  #time-consuming function
+  saveRDS(linear.shape, "results_lin.rds")
+}
+```
+
+Let us fit two models, one with a constant shape parameter and one with
+a linear model in the shape, with the following code.
+
+```{r, eval=FALSE}
+con.shape<-lssVarReg(y=CD4$cd4, 
+                     x=CD4$age, 
+                     locationmodel="semi", 
+                     knots.l=6, 
+                     scale2model="semi", 
+                     knots.sc=3, 
+                     mono.scale = "inc", 
+                     shapemodel="constant",   
+                     maxit=1000 )
+
+linear.shape<-lssVarReg(y=CD4$cd4, 
+                        x=CD4$age, 
+                        locationmodel="semi", 
+                        knots.l=6, 
+                        scale2model="semi", 
+                        knots.sc=3,  
+                        shapemodel="linear", 
+                        int.maxit=1000, 
+                        print.it=TRUE, 
+                        maxit=1000 )
+```
+
+If we want to speed up the model, we can use starting estimates (from our best model) and parameter space restrictions, like so for the constant model:
+```{r, eval=FALSE}
+con.shape_faster <- lssVarReg(y=CD4$cd4, x=CD4$age, 
+                              locationmodel="semi", 
+                              knots.l=6, 
+                              scale2model="semi", 
+                              knots.sc=3,  
+                              shapemodel="constant",  
+                              para.space="positive", 
+                              location.init = cd4.best$best.model$mean, 
+                              scale2.init = cd4.best$best.model$variance,
+                              int.maxit = 10000,
+                              maxit=1000 )
+```
+
+
+And compare the models as we did in the paper:
+
+```{r}
+data.frame(Model = c("No shape", "Constant shape", "Linear shape"), 
+           AIC = c(cd4.best$best.model$aic, con.shape$aic, linear.shape$aic), 
+           BIC = c(cd4.best$best.model$bic, con.shape$bic, linear.shape$bic)) %>% 
+  kbl(digits=1, 
+      align='c', 
+      caption = "Comparison of AIC from shape models for CD4 cell counts.") %>%
+  kable_paper(full_width = TRUE ) 
+```
+
+And compare the residuals:
+
+```{r}
+
+n<-length(CD4$age)
+knot6<-bs(CD4$age, df= 8, degree=2)
+knot3<-bs(CD4$age, df= 5, degree=2)
+
+##normal model
+npred.mean<-colSums(t(cbind(rep(1,n),knot6))*cd4.best$best.model$mean)
+npred.var<-colSums(t(cbind(rep(1,n),knot3))*cd4.best$best.model$variance)
+
+stand.res<- (CD4$cd4-npred.mean)**2/(npred.var)
+chiq<-qchisq(c(1:n)/(n+1), df=1)
+
+#constant residuals
+con.res<-lss_calc(con.shape)
+con.res<-con.res[order(con.res$CD4.age),]
+
+#linear residuals
+lin.res<-lss_calc(linear.shape)
+lin.res<-lin.res[order(lin.res$CD4.age),]
+
+par(mfrow=c(1,3))
+plot(chiq, sort(stand.res), main=NULL, ylim=c(0, 10), pch=19, ylab="Squared standardised residuals after fit with no shape", xlab="Chi-Square(1) quantiles")
+abline(0,1)
+mtext('A', side=3, line=2, at=0, adj=3)
+
+plot(chiq, sort(con.res$stand.res2), main=NULL, ylim=c(0, 10),pch=19, ylab="Squared standardised residuals after LSS (constant) fit", xlab="Chi-Square(1) quantiles")
+abline(0,1)
+mtext('B', side=3, line=2, at=0, adj=3)
+plot(chiq, sort(lin.res$stand.res2), main=NULL, ylim=c(0, 10),pch=19, ylab="Squared standardised residuals after LSS (linear) fit", xlab="Chi-Square(1) quantiles")
+abline(0,1)
+mtext('C', side=3, line=2, at=0, adj=3)
+```
+
+
+## Viral load dataset (censored outcome data)
+
+This is a dataset of the HIV viral load (blood concentration of HIV RNA
+on a log10 scale) measured in 257 participants. Prior to commencing a
+clinical trial, participants had their blood assayed twice during a
+short period of time. Although the underlying viral load is
+unchanged in this time, the readings will differ due to measurement
+error. Another important aspect is that measurements cannot be detected
+below a particular assay limit, in this case, 2.70. 
+
+Lets plot the data:
+  
+```{r}
+ggplot(rna, aes(x=x, y=y))+
+  geom_point()+
+  geom_hline(yintercept = 0)+
+  xlab("Mean viral load")+
+  ylab("Difference in viral load")+
+  theme_minimal()
+```
+
+Now let us search for the optimal knots, using the censoring indicator and 
+
+
+```{r, echo=FALSE}
+if (file.exists("RNAresults.rds")) {
+  rna.best <- readRDS("RNAresults.rds")
+} else {
+  rna.best <- searchVarReg(y=rna$y, 
+                           x=rna$x, 
+                           cens.ind = rna$cc,
+                           maxknots.m = 5,
+                           maxknots.v = 5,
+                           mono.var = "inc",  
+                           selection="AIC", maxit=1000)  #time-consuming function
+  saveRDS(rna.best, "RNAresults.rds")
+}
+if (file.exists("RNAresults2.rds")) {
+  rna.best2 <- readRDS("RNAresults2.rds")
+} else {
+  rna.best2 <- searchVarReg(y=rna$y, x=rna$x, cens.ind = rna$cc,
+                            maxknots.m = 5, maxknots.v = 5,
+                            selection="AIC", maxit=1000)  #time-consuming function
+  saveRDS(rna.best2, "RNAresults2.rds")
+}
+```
+
+Monotonic decreasing model:
+  
+```{r, eval=FALSE}
+rna.best <- searchVarReg(y=rna$y, 
+                         x=rna$x, 
+                         maxknots.m = 5, 
+                         maxknots.v = 5,
+                         mono.var = "dec",  
+                         selection="AIC", 
+                         maxit=1000)  
+```
+
+AIC from all models:
+
+```{r}
+rna.best$AIC %>%
+  kbl(digits=1)
+```
+
+
+Find the smallest AIC:
+```{r}
+min(rna.best$AIC)
+
+```
+
+Allows increasing and decreasing:
+  
+```{r, eval=FALSE}
+rna.best2 <- searchVarReg(y=rna$y, 
+                          x=rna$x, 
+                          cens.ind = rna$cc,
+                          maxknots.m = 5, 
+                          maxknots.v = 5,
+                          selection="AIC", 
+                          maxit=1000)
+```
+
+AIC from all models:
+
+```{r}
+rna.best2$AIC %>%
+  kbl(digits=1)
+```
+
+Smallest AIC:
+```{r}
+min(rna.best2$AIC)
+```
+
