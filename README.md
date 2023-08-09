@@ -21,13 +21,13 @@ new algorithm for fitting semi-parametric variance regression models.
 Comput Stat 36, 2313–2335 (2021).
 <https://doi.org/10.1007/s00180-021-01067-6>
 
-## :raising_hand: Author
+## Author
 
 Kristy Robledo <https://github.com/kristyrobledo>
 
 NHMRC Clinical Trials Centre, University of Sydney
 
-## :arrow_double_down: Installation
+## Installation
 
 You can install the released version of VarReg from
 [CRAN](https://CRAN.R-project.org) with:
@@ -42,7 +42,7 @@ And the development version from [GitHub](https://github.com/) with:
 remotes::install_github("kristyrobledo/VarReg")
 ```
 
-## :book: Examples
+## Examples
 
 For more examples, see this repository
 <https://github.com/kristyrobledo/VarReg-paper-code> which is based on

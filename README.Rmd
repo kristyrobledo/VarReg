@@ -19,38 +19,88 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/VarReg)](https://CRAN.R-project.org/package=VarReg)
 <!-- badges: end -->
 
-The goal of VarReg is to ...
+The goal of VarReg is to provide methods for fitting semi-parametric mean and variance models, with normal or censored data. This has also been extended to allow a regression in the location, scale and shape parameters.
+This algorithm is based upon an EM (Expectation Maximisation) algorithm, so is more stable than other similar methods like GAMLSS.
+
+There is a algorithm paper published:
+Robledo, K.P., Marschner, I.C. A new algorithm for fitting semi-parametric variance regression models. Comput Stat 36, 2313–2335 (2021). <https://doi.org/10.1007/s00180-021-01067-6>
+
+## Author
+
+Kristy Robledo <https://github.com/kristyrobledo>
+
+NHMRC Clinical Trials Centre, University of Sydney
+
 
 ## Installation
 
-You can install the development version of VarReg from [GitHub](https://github.com/) with:
+You can install the released version of VarReg from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("kristyrobledo/VarReg")
+install.packages("VarReg")
 ```
 
-## Example
+And the development version from [GitHub](https://github.com/) with:
 
-This is a basic example which shows you how to solve a common problem:
+``` r
+remotes::install_github("kristyrobledo/VarReg")
+```
+## Examples
+
+For more examples, see this repository [https://github.com/kristyrobledo/VarReg-paper-code](https://github.com/kristyrobledo/VarReg-paper-code)
+ which is based on providing the code from a draft software paper here [https://github.com/kristyrobledo/VarReg-paper](https://github.com/kristyrobledo/VarReg-paper). 
+ 
+This is a basic example to read in the mcycle dataset and perform a linear model in the mean and the variance:
 
 ```{r example}
 library(VarReg)
-## basic example code
+## read in dataset
+data(mcycle)
+## run a model with linear mean and linear variance:
+linmodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="linear", varmodel="linear",
+  maxit=10000)
+
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Now we can plot the model:
 
-```{r cars}
-summary(cars)
+```{r plotlinear}
+plotVarReg(linmodel)
+
+
+##can also add CI
+plotVarReg(linmodel, ci=TRUE, ci.type = "im")
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+Or we can look at the results:
+```{r seelin}
+linmodel$loglik
 
-You can also embed plots, for example:
+linmodel$mean
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+linmodel$variance
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+We can also run a model with semi-parametric mean (4 internal knots) and semi-parametric variance (2 knots):
+
+```{r semimodel}
+semimodel<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
+knots.m=4, knots.v=2, maxit=10000)
+plotVarReg(semimodel)
+
+## run a model with semi-parametric mean (4 internal knots) and semi-parametric monotonic
+## variance (2 knots):
+## not run
+##semimodel_inc<-semiVarReg(mcycle$accel, mcycle$times, meanmodel="semi", varmodel="semi",
+##knots.m=4, knots.v=2, mono.var="inc")
+```
+
+Lastly, we can fit a model with a model in the location, scale and shape. Im not going to run this, just show the code, as it takes a while to run on my laptop!
+
+```{r lss}
+ ##  LSS model followed by the basic plot command
+#lssmodel<-lssVarReg(mcycle$accel, mcycle$times,  locationmodel="linear", scale2model="linear", shapemodel="constant", maxit=10000)
+#plotlssVarReg(lssmodel, xlab="Time in seconds", ylab="Acceleration")
+```
+
+Enjoy!
