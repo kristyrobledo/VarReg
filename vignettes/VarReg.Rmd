@@ -9,16 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  echo=TRUE,
-  collapse = TRUE,
-  comment = "#>"
-)
-library(gamlss)
-library(tidyverse)
-library(kableExtra)
-```
+
 
 
 This repository is for the data and code presented in the paper published here (to be added). 
@@ -27,7 +18,8 @@ This repository is for the data and code presented in the paper published here (
 
 Firstly, you will need to install the `VarReg` package and a few others to perform the code below. 
 
-```{r cars, message=FALSE}
+
+```r
 library(VarReg)
 library(gamlss) #for the CD4 dataset
 library(tidyverse)
@@ -40,16 +32,21 @@ rna<-read.csv(file="resources/rna.csv") #load rna dataset
 This dataset is located within the `gamlss` package. CD4 is a type of white blood cell, and in this dataset, it has been measured in uninfected children born from HIV-1 infected women. The dataset contains 609 measurements of CD4 cell counts
 and the child's age at which the measurements were taken.
 
-```{r}
+
+```r
 
 data("CD4")
 
 str(CD4)
+#> 'data.frame':	609 obs. of  2 variables:
+#>  $ cd4: num  387 2183 904 1681 656 ...
+#>  $ age: num  4.5 0.83 2.06 1.44 2.67 1.17 1.94 1.72 2.54 1.66 ...
 ```
 
 Lets reproduce the graphic in the paper, showing that at younger ages there is more variation in the CD4 counts than at older ages, demonstrating heteroscedasticity.
 
-```{r}
+
+```r
 ggplot(data=CD4, aes(y=cd4, x=age)) +
   geom_point()+
   xlab("Age of child in years")+
@@ -57,12 +54,15 @@ ggplot(data=CD4, aes(y=cd4, x=age)) +
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
 ### Linear model in mean and variance
 
 Let us fit a linear model in the mean and variance model, like so
 
 
-```{r}
+
+```r
 cd4.linear<-semiVarReg(y = CD4$cd4, 
                        x=CD4$age, 
                        meanmodel = "linear", 
@@ -72,46 +72,43 @@ cd4.linear<-semiVarReg(y = CD4$cd4,
 
 key outputs for model fit:
 
-```{r}
+
+```r
 cd4.linear$aic
+#> [1] 8999.12
 cd4.linear$bic
+#> [1] 9016.767
 ```
 
 Key estimates from model:
 
-```{r}
+
+```r
 cd4.linear$mean
+#> Intercept   CD4$age 
+#>  884.7263 -124.8084
 cd4.linear$variance
+#> Intercept   CD4$age 
+#> 218069.56 -23922.79
 ```
 
 ### Visualise the model with `plotVarReg` function:
 
-```{r, fig.dim=c(6,6)}
+
+```r
 plotVarReg(cd4.linear, xlab = "Age in years", ylab = "CD4 cell count")
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
 
 ### Searching for the optimal spline
 
 Searching to a max of 7 knots in the mean and variance, with maximum iterations (`maxit`) of 100 to minimise time taken for the search:
 
-```{r, echo=FALSE}
-if (file.exists("resources/results.rds")) {
-  cd4.best <- readRDS("resources/results.rds")
 
-} else {
 
-  # create the results dataset -> now using the saved code as time consuming
-  cd4.best <- searchVarReg(y=CD4$cd4, 
-                           x=CD4$age, 
-                           maxknots.m = 7, 
-                           maxknots.v = 7, 
-                           selection="AIC", 
-                           maxit=100)  #time-consuming function so not 1000 
-  saveRDS(cd4.best, "resources/results.rds")
-}
-```
 
-```{r, eval=FALSE}
+```r
 cd4.best <- searchVarReg(y=CD4$cd4, 
                          x=CD4$age, 
                          maxknots.m = 7, 
@@ -123,30 +120,206 @@ cd4.best <- searchVarReg(y=CD4$cd4,
 
 lets look at the AIC table to identify where the best model is located:
 
-```{r}
+
+```r
 cd4.best$AIC %>%
   kbl(digits=1)
 ```
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Mean_zero </th>
+   <th style="text-align:right;"> Mean_constant </th>
+   <th style="text-align:right;"> Mean_linear </th>
+   <th style="text-align:right;"> Mean_Knot0 </th>
+   <th style="text-align:right;"> Mean_Knot1 </th>
+   <th style="text-align:right;"> Mean_Knot2 </th>
+   <th style="text-align:right;"> Mean_Knot3 </th>
+   <th style="text-align:right;"> Mean_Knot4 </th>
+   <th style="text-align:right;"> Mean_Knot5 </th>
+   <th style="text-align:right;"> Mean_Knot6 </th>
+   <th style="text-align:right;"> Mean_Knot7 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Var_constant </td>
+   <td style="text-align:right;"> 9750.8 </td>
+   <td style="text-align:right;"> 9205.7 </td>
+   <td style="text-align:right;"> 9044.1 </td>
+   <td style="text-align:right;"> 8995.6 </td>
+   <td style="text-align:right;"> 8997.3 </td>
+   <td style="text-align:right;"> 8977.0 </td>
+   <td style="text-align:right;"> 8972.1 </td>
+   <td style="text-align:right;"> 8967.6 </td>
+   <td style="text-align:right;"> 8966.3 </td>
+   <td style="text-align:right;"> 8964.8 </td>
+   <td style="text-align:right;"> 8964.6 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_linear </td>
+   <td style="text-align:right;"> 9662.4 </td>
+   <td style="text-align:right;"> 9157.1 </td>
+   <td style="text-align:right;"> 8999.8 </td>
+   <td style="text-align:right;"> 8919.5 </td>
+   <td style="text-align:right;"> 8916.2 </td>
+   <td style="text-align:right;"> 8893.4 </td>
+   <td style="text-align:right;"> 8889.8 </td>
+   <td style="text-align:right;"> 8886.4 </td>
+   <td style="text-align:right;"> 8885.6 </td>
+   <td style="text-align:right;"> 8884.5 </td>
+   <td style="text-align:right;"> 8884.7 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot0 </td>
+   <td style="text-align:right;"> 9554.9 </td>
+   <td style="text-align:right;"> 9157.1 </td>
+   <td style="text-align:right;"> 8947.8 </td>
+   <td style="text-align:right;"> 8839.2 </td>
+   <td style="text-align:right;"> 8834.9 </td>
+   <td style="text-align:right;"> 8862.5 </td>
+   <td style="text-align:right;"> 8890.6 </td>
+   <td style="text-align:right;"> 8905.7 </td>
+   <td style="text-align:right;"> 8912.8 </td>
+   <td style="text-align:right;"> 8916.5 </td>
+   <td style="text-align:right;"> 8920.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot1 </td>
+   <td style="text-align:right;"> 9569.4 </td>
+   <td style="text-align:right;"> 9071.5 </td>
+   <td style="text-align:right;"> 8904.2 </td>
+   <td style="text-align:right;"> 8843.9 </td>
+   <td style="text-align:right;"> 8843.7 </td>
+   <td style="text-align:right;"> 8827.6 </td>
+   <td style="text-align:right;"> 8825.4 </td>
+   <td style="text-align:right;"> 8823.6 </td>
+   <td style="text-align:right;"> 8823.3 </td>
+   <td style="text-align:right;"> 8822.8 </td>
+   <td style="text-align:right;"> 8823.6 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot2 </td>
+   <td style="text-align:right;"> 9529.3 </td>
+   <td style="text-align:right;"> 8998.8 </td>
+   <td style="text-align:right;"> 8897.0 </td>
+   <td style="text-align:right;"> 8842.4 </td>
+   <td style="text-align:right;"> 8843.9 </td>
+   <td style="text-align:right;"> 8810.5 </td>
+   <td style="text-align:right;"> 8804.0 </td>
+   <td style="text-align:right;"> 8799.1 </td>
+   <td style="text-align:right;"> 8797.8 </td>
+   <td style="text-align:right;"> 8797.3 </td>
+   <td style="text-align:right;"> 8798.5 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot3 </td>
+   <td style="text-align:right;"> 9524.5 </td>
+   <td style="text-align:right;"> 8989.1 </td>
+   <td style="text-align:right;"> 8892.3 </td>
+   <td style="text-align:right;"> 8845.5 </td>
+   <td style="text-align:right;"> 8847.5 </td>
+   <td style="text-align:right;"> 8809.0 </td>
+   <td style="text-align:right;"> 8802.2 </td>
+   <td style="text-align:right;"> 8797.2 </td>
+   <td style="text-align:right;"> 8796.2 </td>
+   <td style="text-align:right;"> 8795.6 </td>
+   <td style="text-align:right;"> 8796.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot4 </td>
+   <td style="text-align:right;"> 9526.0 </td>
+   <td style="text-align:right;"> 8989.6 </td>
+   <td style="text-align:right;"> 8893.1 </td>
+   <td style="text-align:right;"> 8848.0 </td>
+   <td style="text-align:right;"> 8849.8 </td>
+   <td style="text-align:right;"> 8813.2 </td>
+   <td style="text-align:right;"> 8805.8 </td>
+   <td style="text-align:right;"> 8801.3 </td>
+   <td style="text-align:right;"> 8800.6 </td>
+   <td style="text-align:right;"> 8800.2 </td>
+   <td style="text-align:right;"> 8801.3 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot5 </td>
+   <td style="text-align:right;"> 9525.9 </td>
+   <td style="text-align:right;"> 8985.4 </td>
+   <td style="text-align:right;"> 8894.0 </td>
+   <td style="text-align:right;"> 8849.5 </td>
+   <td style="text-align:right;"> 8851.4 </td>
+   <td style="text-align:right;"> 8809.1 </td>
+   <td style="text-align:right;"> 8803.7 </td>
+   <td style="text-align:right;"> 8800.0 </td>
+   <td style="text-align:right;"> 8799.1 </td>
+   <td style="text-align:right;"> 8798.9 </td>
+   <td style="text-align:right;"> 8800.1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot6 </td>
+   <td style="text-align:right;"> 9527.4 </td>
+   <td style="text-align:right;"> 8987.0 </td>
+   <td style="text-align:right;"> 8895.1 </td>
+   <td style="text-align:right;"> 8851.7 </td>
+   <td style="text-align:right;"> 8853.6 </td>
+   <td style="text-align:right;"> 8810.9 </td>
+   <td style="text-align:right;"> 8804.9 </td>
+   <td style="text-align:right;"> 8801.3 </td>
+   <td style="text-align:right;"> 8800.6 </td>
+   <td style="text-align:right;"> 8800.4 </td>
+   <td style="text-align:right;"> 8801.4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot7 </td>
+   <td style="text-align:right;"> 9530.4 </td>
+   <td style="text-align:right;"> 8988.6 </td>
+   <td style="text-align:right;"> 8896.6 </td>
+   <td style="text-align:right;"> 8852.4 </td>
+   <td style="text-align:right;"> 8854.2 </td>
+   <td style="text-align:right;"> 8813.2 </td>
+   <td style="text-align:right;"> 8807.9 </td>
+   <td style="text-align:right;"> 8804.3 </td>
+   <td style="text-align:right;"> 8803.4 </td>
+   <td style="text-align:right;"> 8803.2 </td>
+   <td style="text-align:right;"> 8804.4 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
 The best model is saved within the `cd4.best` list. The key estimates from the best model are:
 
 
-```{r}
+
+```r
 cd4.best$best.model$knots.m
+#> [1] 6
 cd4.best$best.model$knots.v
+#> [1] 3
 
 cd4.best$best.model$mean
+#>    Intercept M_Knt6_Base1 M_Knt6_Base2 M_Knt6_Base3 M_Knt6_Base4 M_Knt6_Base5 M_Knt6_Base6 
+#>     32.98833   1597.06078    713.32197    582.58478    472.08281    291.50092    269.24506 
+#> M_Knt6_Base7 M_Knt6_Base8 
+#>    220.66235    155.83254
 cd4.best$best.model$variance
+#>    Intercept V_Knt3_Base1 V_Knt3_Base2 V_Knt3_Base3 V_Knt3_Base4 V_Knt3_Base5 
+#>   40801.4581  411830.6370  109290.5901    2784.9777     914.4245  -25616.3670
 ```
 
 ie. 6 knots in mean and 3 in variance, with parameter estimates as given. 
 We can then plot this best model:
 
-```{r, fig.dim=c(6,6)}
+
+```r
 plotVarReg(cd4.best$best.model, 
            xlab = "Age in years", 
            ylab = "CD4 cell count")
 ```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
 
 From these residuals, there still appears to be deviations from
 normality in the residuals, again seen in both the Q-Q plot and the
@@ -160,48 +333,13 @@ the `lssVarReg()` function. Firstly, let us fit a constant shape parameter
 with 6 knots in the mean and 3 knots in the variance, that is,
 
 
-```{r, echo=FALSE}
-#$Y_i \sim SN\left(\xi_0+\sum\limits_{p=1}^8 \xi_p s_{ip}, \omega_0+\sum\limits_{q=1}^6 \omega_q l_{iq}, \nu_0 \right), ~~~ i=1,2,...,609$
-#where $s_{ip}$ are the B-spline basis functions ($p=1,2,...,8$) for six
-#knots and $l_{ip}$ are the B-spline basis functions ($q=1,2,...,6$) for
-#three knots, both based upon age in years.
 
-if (file.exists("resources/results_con.rds")) {
-  con.shape <- readRDS("resources/results_con.rds")
-
-
-} else {
-  con.shape <- lssVarReg(y=CD4$cd4, x=CD4$age, 
-                locationmodel="semi", knots.l=6, 
-                scale2model="semi", knots.sc=3,  
-                shapemodel="constant",  
-                para.space="positive",
-                location.init = cd4.best$best.model$mean, 
-                scale2.init = cd4.best$best.model$variance,
-                int.maxit = 10000,
-                maxit=1000 )  #time-consuming function
-  saveRDS(con.shape, "results_con.rds")
-}
-
-if (file.exists("resources/results_lin.rds")) {
-  linear.shape <- readRDS("resources/results_lin.rds")
-} else {
-  linear.shape <- lssVarReg(y=CD4$cd4, x=CD4$age, 
-                locationmodel="semi", knots.l=6, 
-                scale2model="semi", knots.sc=3,  
-                shapemodel="linear",   
-                para.space="positive",
-                location.init = cd4.best$best.model$mean, 
-                scale2.init = cd4.best$best.model$variance,
-                maxit=1000 )  #time-consuming function
-  saveRDS(linear.shape, "resources/results_lin.rds")
-}
-```
 
 Let us fit two models, one with a constant shape parameter and one with
 a linear model in the shape, with the following code.
 
-```{r, eval=FALSE}
+
+```r
 con.shape<-lssVarReg(y=CD4$cd4, 
                      x=CD4$age, 
                      locationmodel="semi", 
@@ -225,7 +363,8 @@ linear.shape<-lssVarReg(y=CD4$cd4,
 ```
 
 If we want to speed up the model, we can use starting estimates (from our best model) and parameter space restrictions, like so for the constant model:
-```{r, eval=FALSE}
+
+```r
 con.shape_faster <- lssVarReg(y=CD4$cd4, x=CD4$age, 
                               locationmodel="semi", 
                               knots.l=6, 
@@ -242,7 +381,8 @@ con.shape_faster <- lssVarReg(y=CD4$cd4, x=CD4$age,
 
 And compare the models as we did in the paper:
 
-```{r}
+
+```r
 data.frame(Model = c("No shape", "Constant shape", "Linear shape"), 
            AIC = c(cd4.best$best.model$aic, con.shape$aic, linear.shape$aic), 
            BIC = c(cd4.best$best.model$bic, con.shape$bic, linear.shape$bic)) %>% 
@@ -252,9 +392,40 @@ data.frame(Model = c("No shape", "Constant shape", "Linear shape"),
   kable_paper(full_width = TRUE ) 
 ```
 
+<table class=" lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>Comparison of AIC from shape models for CD4 cell counts.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Model </th>
+   <th style="text-align:center;"> AIC </th>
+   <th style="text-align:center;"> BIC </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> No shape </td>
+   <td style="text-align:center;"> 8795.6 </td>
+   <td style="text-align:center;"> 8861.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> Constant shape </td>
+   <td style="text-align:center;"> 8697.7 </td>
+   <td style="text-align:center;"> 8768.3 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> Linear shape </td>
+   <td style="text-align:center;"> 8687.1 </td>
+   <td style="text-align:center;"> 8762.1 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
 And compare the residuals:
 
-```{r}
+
+```r
 
 n<-length(CD4$age)
 knot6<-bs(CD4$age, df= 8, degree=2)
@@ -288,6 +459,8 @@ abline(0,1)
 mtext('C', side=3, line=2, at=0, adj=3)
 ```
 
+![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png)
+
 
 ## Viral load dataset (censored outcome data)
 
@@ -301,7 +474,8 @@ below a particular assay limit, in this case, 2.70.
 
 Lets plot the data:
   
-```{r}
+
+```r
 ggplot(rna, aes(x=x, y=y))+
   geom_point()+
   geom_hline(yintercept = 0)+
@@ -310,35 +484,17 @@ ggplot(rna, aes(x=x, y=y))+
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
+
 Now let us search for the optimal knots, using the censoring indicator and 
 
 
-```{r, echo=FALSE}
-if (file.exists("resources/RNAresults.rds")) {
-  rna.best <- readRDS("resources/RNAresults.rds")
-} else {
-  rna.best <- searchVarReg(y=rna$y, 
-                           x=rna$x, 
-                           cens.ind = rna$cc,
-                           maxknots.m = 5,
-                           maxknots.v = 5,
-                           mono.var = "inc",  
-                           selection="AIC", maxit=1000)  #time-consuming function
-  saveRDS(rna.best, "resources/RNAresults.rds")
-}
-if (file.exists("resources/RNAresults2.rds")) {
-  rna.best2 <- readRDS("resources/RNAresults2.rds")
-} else {
-  rna.best2 <- searchVarReg(y=rna$y, x=rna$x, cens.ind = rna$cc,
-                            maxknots.m = 5, maxknots.v = 5,
-                            selection="AIC", maxit=1000)  #time-consuming function
-  saveRDS(rna.best2, "resources/RNAresults2.rds")
-}
-```
+
 
 Monotonic decreasing model:
   
-```{r, eval=FALSE}
+
+```r
 rna.best <- searchVarReg(y=rna$y, 
                          x=rna$x, 
                          maxknots.m = 5, 
@@ -350,21 +506,141 @@ rna.best <- searchVarReg(y=rna$y,
 
 AIC from all models:
 
-```{r}
+
+```r
 rna.best$AIC %>%
   kbl(digits=1)
 ```
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Mean_zero </th>
+   <th style="text-align:right;"> Mean_constant </th>
+   <th style="text-align:right;"> Mean_linear </th>
+   <th style="text-align:right;"> Mean_Knot0 </th>
+   <th style="text-align:right;"> Mean_Knot1 </th>
+   <th style="text-align:right;"> Mean_Knot2 </th>
+   <th style="text-align:right;"> Mean_Knot3 </th>
+   <th style="text-align:right;"> Mean_Knot4 </th>
+   <th style="text-align:right;"> Mean_Knot5 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Var_constant </td>
+   <td style="text-align:right;"> 356.6 </td>
+   <td style="text-align:right;"> 358.6 </td>
+   <td style="text-align:right;"> 360.7 </td>
+   <td style="text-align:right;"> 362.4 </td>
+   <td style="text-align:right;"> 364.4 </td>
+   <td style="text-align:right;"> 366.8 </td>
+   <td style="text-align:right;"> 367.6 </td>
+   <td style="text-align:right;"> 368.0 </td>
+   <td style="text-align:right;"> 370.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_linear </td>
+   <td style="text-align:right;"> 343.7 </td>
+   <td style="text-align:right;"> 345.0 </td>
+   <td style="text-align:right;"> 346.6 </td>
+   <td style="text-align:right;"> 343.8 </td>
+   <td style="text-align:right;"> 346.0 </td>
+   <td style="text-align:right;"> 346.8 </td>
+   <td style="text-align:right;"> 348.2 </td>
+   <td style="text-align:right;"> 349.7 </td>
+   <td style="text-align:right;"> 351.9 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot0 </td>
+   <td style="text-align:right;"> 308.8 </td>
+   <td style="text-align:right;"> 310.4 </td>
+   <td style="text-align:right;"> 312.4 </td>
+   <td style="text-align:right;"> 314.0 </td>
+   <td style="text-align:right;"> 314.7 </td>
+   <td style="text-align:right;"> 316.5 </td>
+   <td style="text-align:right;"> 318.5 </td>
+   <td style="text-align:right;"> 319.1 </td>
+   <td style="text-align:right;"> 321.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot1 </td>
+   <td style="text-align:right;"> 301.4 </td>
+   <td style="text-align:right;"> 303.1 </td>
+   <td style="text-align:right;"> 305.0 </td>
+   <td style="text-align:right;"> 306.8 </td>
+   <td style="text-align:right;"> 307.9 </td>
+   <td style="text-align:right;"> 309.2 </td>
+   <td style="text-align:right;"> 311.5 </td>
+   <td style="text-align:right;"> 311.8 </td>
+   <td style="text-align:right;"> 313.6 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot2 </td>
+   <td style="text-align:right;"> 300.2 </td>
+   <td style="text-align:right;"> 301.7 </td>
+   <td style="text-align:right;"> 303.7 </td>
+   <td style="text-align:right;"> 305.3 </td>
+   <td style="text-align:right;"> 306.4 </td>
+   <td style="text-align:right;"> 308.0 </td>
+   <td style="text-align:right;"> 310.2 </td>
+   <td style="text-align:right;"> 310.3 </td>
+   <td style="text-align:right;"> 312.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot3 </td>
+   <td style="text-align:right;"> 300.9 </td>
+   <td style="text-align:right;"> 302.6 </td>
+   <td style="text-align:right;"> 304.5 </td>
+   <td style="text-align:right;"> 306.0 </td>
+   <td style="text-align:right;"> 307.2 </td>
+   <td style="text-align:right;"> 308.8 </td>
+   <td style="text-align:right;"> 310.9 </td>
+   <td style="text-align:right;"> 311.0 </td>
+   <td style="text-align:right;"> 312.9 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot4 </td>
+   <td style="text-align:right;"> 302.5 </td>
+   <td style="text-align:right;"> 304.2 </td>
+   <td style="text-align:right;"> 306.0 </td>
+   <td style="text-align:right;"> 307.7 </td>
+   <td style="text-align:right;"> 308.7 </td>
+   <td style="text-align:right;"> 310.2 </td>
+   <td style="text-align:right;"> 312.4 </td>
+   <td style="text-align:right;"> 312.5 </td>
+   <td style="text-align:right;"> 314.4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot5 </td>
+   <td style="text-align:right;"> 301.9 </td>
+   <td style="text-align:right;"> 303.5 </td>
+   <td style="text-align:right;"> 305.5 </td>
+   <td style="text-align:right;"> 306.8 </td>
+   <td style="text-align:right;"> 307.9 </td>
+   <td style="text-align:right;"> 309.6 </td>
+   <td style="text-align:right;"> 311.8 </td>
+   <td style="text-align:right;"> 312.1 </td>
+   <td style="text-align:right;"> 313.8 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
 
 Find the smallest AIC:
-```{r}
-min(rna.best$AIC)
 
+```r
+min(rna.best$AIC)
+#> [1] 300.1673
 ```
 
 Allows increasing and decreasing:
   
-```{r, eval=FALSE}
+
+```r
 rna.best2 <- searchVarReg(y=rna$y, 
                           x=rna$x, 
                           cens.ind = rna$cc,
@@ -376,13 +652,133 @@ rna.best2 <- searchVarReg(y=rna$y,
 
 AIC from all models:
 
-```{r}
+
+```r
 rna.best2$AIC %>%
   kbl(digits=1)
 ```
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Mean_zero </th>
+   <th style="text-align:right;"> Mean_constant </th>
+   <th style="text-align:right;"> Mean_linear </th>
+   <th style="text-align:right;"> Mean_Knot0 </th>
+   <th style="text-align:right;"> Mean_Knot1 </th>
+   <th style="text-align:right;"> Mean_Knot2 </th>
+   <th style="text-align:right;"> Mean_Knot3 </th>
+   <th style="text-align:right;"> Mean_Knot4 </th>
+   <th style="text-align:right;"> Mean_Knot5 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Var_constant </td>
+   <td style="text-align:right;"> 356.6 </td>
+   <td style="text-align:right;"> 358.6 </td>
+   <td style="text-align:right;"> 360.7 </td>
+   <td style="text-align:right;"> 362.4 </td>
+   <td style="text-align:right;"> 364.4 </td>
+   <td style="text-align:right;"> 366.8 </td>
+   <td style="text-align:right;"> 367.6 </td>
+   <td style="text-align:right;"> 368.0 </td>
+   <td style="text-align:right;"> 370.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_linear </td>
+   <td style="text-align:right;"> 343.7 </td>
+   <td style="text-align:right;"> 345.0 </td>
+   <td style="text-align:right;"> 346.6 </td>
+   <td style="text-align:right;"> 343.8 </td>
+   <td style="text-align:right;"> 346.0 </td>
+   <td style="text-align:right;"> 346.8 </td>
+   <td style="text-align:right;"> 348.2 </td>
+   <td style="text-align:right;"> 349.7 </td>
+   <td style="text-align:right;"> 351.9 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot0 </td>
+   <td style="text-align:right;"> 364.6 </td>
+   <td style="text-align:right;"> 366.1 </td>
+   <td style="text-align:right;"> 368.0 </td>
+   <td style="text-align:right;"> 365.0 </td>
+   <td style="text-align:right;"> 367.1 </td>
+   <td style="text-align:right;"> 368.3 </td>
+   <td style="text-align:right;"> 369.6 </td>
+   <td style="text-align:right;"> 371.0 </td>
+   <td style="text-align:right;"> 373.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot1 </td>
+   <td style="text-align:right;"> 323.2 </td>
+   <td style="text-align:right;"> 325.1 </td>
+   <td style="text-align:right;"> 327.0 </td>
+   <td style="text-align:right;"> 327.6 </td>
+   <td style="text-align:right;"> 329.2 </td>
+   <td style="text-align:right;"> 330.9 </td>
+   <td style="text-align:right;"> 333.1 </td>
+   <td style="text-align:right;"> 332.9 </td>
+   <td style="text-align:right;"> 334.4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot2 </td>
+   <td style="text-align:right;"> 299.4 </td>
+   <td style="text-align:right;"> 300.7 </td>
+   <td style="text-align:right;"> 302.6 </td>
+   <td style="text-align:right;"> 303.1 </td>
+   <td style="text-align:right;"> 304.2 </td>
+   <td style="text-align:right;"> 306.1 </td>
+   <td style="text-align:right;"> 308.1 </td>
+   <td style="text-align:right;"> 308.1 </td>
+   <td style="text-align:right;"> 309.9 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot3 </td>
+   <td style="text-align:right;"> 299.9 </td>
+   <td style="text-align:right;"> 301.3 </td>
+   <td style="text-align:right;"> 303.2 </td>
+   <td style="text-align:right;"> 303.6 </td>
+   <td style="text-align:right;"> 304.8 </td>
+   <td style="text-align:right;"> 306.6 </td>
+   <td style="text-align:right;"> 308.6 </td>
+   <td style="text-align:right;"> 308.6 </td>
+   <td style="text-align:right;"> 310.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot4 </td>
+   <td style="text-align:right;"> 300.4 </td>
+   <td style="text-align:right;"> 302.0 </td>
+   <td style="text-align:right;"> 303.8 </td>
+   <td style="text-align:right;"> 304.0 </td>
+   <td style="text-align:right;"> 304.8 </td>
+   <td style="text-align:right;"> 306.5 </td>
+   <td style="text-align:right;"> 308.7 </td>
+   <td style="text-align:right;"> 308.7 </td>
+   <td style="text-align:right;"> 310.7 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Var_Knot5 </td>
+   <td style="text-align:right;"> 301.5 </td>
+   <td style="text-align:right;"> 303.0 </td>
+   <td style="text-align:right;"> 304.9 </td>
+   <td style="text-align:right;"> 304.7 </td>
+   <td style="text-align:right;"> 305.7 </td>
+   <td style="text-align:right;"> 307.7 </td>
+   <td style="text-align:right;"> 309.7 </td>
+   <td style="text-align:right;"> 310.4 </td>
+   <td style="text-align:right;"> 311.9 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
 Smallest AIC:
-```{r}
+
+```r
 min(rna.best2$AIC)
+#> [1] 299.3517
 ```
 
