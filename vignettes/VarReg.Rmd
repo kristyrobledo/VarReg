@@ -2,7 +2,7 @@
 title: "VarReg: Basic usage"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{VarReg: Basic usage}
+  %\VignetteIndexEntry{VarReg}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

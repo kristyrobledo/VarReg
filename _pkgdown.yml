@@ -1,33 +1,38 @@
 url: https://kristyrobledo.github.io/VarReg/
 template:
   bootstrap: 5
-  bootswatch: Journal
 reference:
 - title: "VarReg main functions"
   desc: >
     Main functions to run algorithms
   contents:
-  - semiVarReg()
-  - lssVarReg()
-  - searchVarReg()
+  - semiVarReg
+  - lssVarReg
+  - searchVarReg
 - title: "Plot functions"
   contents:
-  - plotVarReg()
-  - plotlssVarReg()
+  - plotVarReg
+  - plotlssVarReg
 - title: "VarReg functions for multivariable models"
   contents:
-  - semiVarReg.multi()
-  - lssVarReg.multi()
+  - semiVarReg.multi
+  - lssVarReg.multi
+- title: "Datasets"
+  contents:
+  - lidar
+  - mcycle
+  - vcf
 - title: "VarReg helper functions"
   desc: >
     Helper algorithms that would not normally be called by a user
   contents:
-  - loop_lss()
-  - loop_em()
-  - censloop_em()
-  - lss_calc()
-  - criterion()
-  - seVarReg()
-  - linVarReg()
-  - censlinVarReg()
-  - VarReg.control()
+  - VarReg
+  - loop_lss
+  - loop_em
+  - censloop_em
+  - lss_calc
+  - criterion
+  - seVarReg
+  - linVarReg
+  - censlinVarReg
+  - VarReg.control
