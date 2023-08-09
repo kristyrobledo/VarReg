@@ -9,6 +9,8 @@ License: GPL-3
 Depends: R (>= 3.5.0)
 LazyData: TRUE
 Suggests:
+    knitr,
+    rmarkdown,
     testthat
 Imports:
     splines,
@@ -19,3 +21,6 @@ Imports:
     utils
 RoxygenNote: 7.2.3
 Encoding: UTF-8
+VignetteBuilder: knitr
+URL: https://github.com/kristyrobledo/VarReg
+BugReports: https://github.com/kristyrobledo/VarReg/issues
