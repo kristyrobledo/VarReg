@@ -1,5 +1,7 @@
 ---
-title: "VarReg: Basic usage"
+title: "VarReg"
+resource_files:
+  - resources/
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{VarReg}
@@ -27,7 +29,7 @@ library(VarReg)
 library(gamlss) #for the CD4 dataset
 library(tidyverse)
 library(kableExtra)
-rna<-read.csv(file="rna.csv") #load rna dataset
+rna<-read.csv(file="resources/rna.csv") #load rna dataset
 ```
 
 ## CD4 dataset
@@ -90,8 +92,8 @@ plotVarReg(cd4.linear, xlab = "Age in years", ylab = "CD4 cell count")
 Searching to a max of 7 knots in the mean and variance, with maximum iterations (`maxit`) of 100 to minimise time taken for the search:
 
 ```{r, echo=FALSE}
-if (file.exists("results.rds")) {
-  cd4.best <- readRDS("results.rds")
+if (file.exists("resources/results.rds")) {
+  cd4.best <- readRDS("resources/results.rds")
 
 } else {
 
@@ -102,7 +104,7 @@ if (file.exists("results.rds")) {
                            maxknots.v = 7, 
                            selection="AIC", 
                            maxit=100)  #time-consuming function so not 1000 
-  saveRDS(cd4.best, "results.rds")
+  saveRDS(cd4.best, "resources/results.rds")
 }
 ```
 
@@ -161,8 +163,8 @@ with 6 knots in the mean and 3 knots in the variance, that is,
 #knots and $l_{ip}$ are the B-spline basis functions ($q=1,2,...,6$) for
 #three knots, both based upon age in years.
 
-if (file.exists("results_con.rds")) {
-  con.shape <- readRDS("results_con.rds")
+if (file.exists("resources/results_con.rds")) {
+  con.shape <- readRDS("resources/results_con.rds")
 
 
 } else {
@@ -178,8 +180,8 @@ if (file.exists("results_con.rds")) {
   saveRDS(con.shape, "results_con.rds")
 }
 
-if (file.exists("results_lin.rds")) {
-  linear.shape <- readRDS("results_lin.rds")
+if (file.exists("resources/results_lin.rds")) {
+  linear.shape <- readRDS("resources/results_lin.rds")
 } else {
   linear.shape <- lssVarReg(y=CD4$cd4, x=CD4$age, 
                 locationmodel="semi", knots.l=6, 
@@ -189,7 +191,7 @@ if (file.exists("results_lin.rds")) {
                 location.init = cd4.best$best.model$mean, 
                 scale2.init = cd4.best$best.model$variance,
                 maxit=1000 )  #time-consuming function
-  saveRDS(linear.shape, "results_lin.rds")
+  saveRDS(linear.shape, "resources/results_lin.rds")
 }
 ```
 
@@ -309,8 +311,8 @@ Now let us search for the optimal knots, using the censoring indicator and
 
 
 ```{r, echo=FALSE}
-if (file.exists("RNAresults.rds")) {
-  rna.best <- readRDS("RNAresults.rds")
+if (file.exists("resources/RNAresults.rds")) {
+  rna.best <- readRDS("resources/RNAresults.rds")
 } else {
   rna.best <- searchVarReg(y=rna$y, 
                            x=rna$x, 
@@ -319,15 +321,15 @@ if (file.exists("RNAresults.rds")) {
                            maxknots.v = 5,
                            mono.var = "inc",  
                            selection="AIC", maxit=1000)  #time-consuming function
-  saveRDS(rna.best, "RNAresults.rds")
+  saveRDS(rna.best, "resources/RNAresults.rds")
 }
-if (file.exists("RNAresults2.rds")) {
-  rna.best2 <- readRDS("RNAresults2.rds")
+if (file.exists("resources/RNAresults2.rds")) {
+  rna.best2 <- readRDS("resources/RNAresults2.rds")
 } else {
   rna.best2 <- searchVarReg(y=rna$y, x=rna$x, cens.ind = rna$cc,
                             maxknots.m = 5, maxknots.v = 5,
                             selection="AIC", maxit=1000)  #time-consuming function
-  saveRDS(rna.best2, "RNAresults2.rds")
+  saveRDS(rna.best2, "resources/RNAresults2.rds")
 }
 ```
 
