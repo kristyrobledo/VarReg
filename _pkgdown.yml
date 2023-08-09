@@ -1,6 +1,7 @@
 url: https://kristyrobledo.github.io/VarReg/
 template:
   bootstrap: 5
+  bootswatch: yeti
 reference:
 - title: "VarReg main functions"
   desc: >
