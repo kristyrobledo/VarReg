@@ -3,5 +3,8 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   VarReg: VarReg.html
-last_built: 2023-08-09T01:48Z
+last_built: 2023-08-09T03:58Z
+urls:
+  reference: https://kristyrobledo.github.io/VarReg/reference
+  article: https://kristyrobledo.github.io/VarReg/articles
 
