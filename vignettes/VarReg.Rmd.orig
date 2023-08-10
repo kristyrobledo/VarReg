@@ -13,8 +13,7 @@ vignette: >
 knitr::opts_chunk$set(
   echo=TRUE,
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "varregfig-"
+  comment = "#>"
 )
 library(gamlss)
 library(tidyverse)
@@ -54,7 +53,7 @@ str(CD4)
 
 Lets reproduce the graphic in the paper, showing that at younger ages there is more variation in the CD4 counts than at older ages, demonstrating heteroscedasticity.
 
-```{r cd4p1}
+```{r cd4p1, fig.cap="CD4 dataset: more variation in the CD4 counts at younger ages than at older ages"}
 ggplot(data=CD4, aes(y=cd4, x=age)) +
   geom_point()+
   xlab("Age of child in years")+
@@ -91,7 +90,7 @@ cd4.linear$variance
 
 ### Visualise the model with `plotVarReg` function:
 
-```{r plotcd4, fig.dim=c(6,6)}
+```{r plotcd4, fig.dim=c(6,6), fig.cap="PlotVarReg example"}
 plotVarReg(cd4.linear, xlab = "Age in years", ylab = "CD4 cell count")
 ```
 
@@ -147,7 +146,7 @@ cd4.best$best.model$variance
 ie. 6 knots in mean and 3 in variance, with parameter estimates as given.
 We can then plot this best model:
 
-```{r plotvarreg2, fig.dim=c(6,6)}
+```{r plotvarreg2, fig.dim=c(6,6), fig.cap="plotVarReg example of best model from search VarReg"}
 plotVarReg(cd4.best$best.model,
            xlab = "Age in years",
            ylab = "CD4 cell count")
@@ -259,7 +258,7 @@ data.frame(Model = c("No shape", "Constant shape", "Linear shape"),
 
 And compare the residuals:
 
-```{r resp}
+```{r resp, fig.cap="Comparison of residuals"}
 
 n<-length(CD4$age)
 knot6<-bs(CD4$age, df= 8, degree=2)
@@ -306,7 +305,7 @@ below a particular assay limit, in this case, 2.70.
 
 Lets plot the data:
 
-```{r viralp}
+```{r viralp, fig.cap = "Viral load data demonstrating measurement error"}
 ggplot(rna, aes(x=x, y=y))+
   geom_point()+
   geom_hline(yintercept = 0)+

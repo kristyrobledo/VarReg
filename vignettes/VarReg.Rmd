@@ -54,7 +54,7 @@ ggplot(data=CD4, aes(y=cd4, x=age)) +
   theme_minimal()
 ```
 
-![plot of chunk cd4p1](varregfig-cd4p1-1.png)
+![CD4 dataset: more variation in the CD4 counts at younger ages than at older ages](figure/cd4p1-1.png)
 
 ### Linear model in mean and variance
 
@@ -99,7 +99,7 @@ cd4.linear$variance
 plotVarReg(cd4.linear, xlab = "Age in years", ylab = "CD4 cell count")
 ```
 
-![plot of chunk plotcd4](varregfig-plotcd4-1.png)
+![PlotVarReg example](figure/plotcd4-1.png)
 
 ### Searching for the optimal spline
 
@@ -300,10 +300,10 @@ cd4.best$best.model$knots.v
 #> [1] 3
 
 cd4.best$best.model$mean
-#>    Intercept M_Knt6_Base1 M_Knt6_Base2 M_Knt6_Base3 M_Knt6_Base4 M_Knt6_Base5 M_Knt6_Base6 
-#>     32.98833   1597.06078    713.32197    582.58478    472.08281    291.50092    269.24506 
-#> M_Knt6_Base7 M_Knt6_Base8 
-#>    220.66235    155.83254
+#>    Intercept M_Knt6_Base1 M_Knt6_Base2 M_Knt6_Base3 M_Knt6_Base4 M_Knt6_Base5 M_Knt6_Base6 M_Knt6_Base7 
+#>     32.98833   1597.06078    713.32197    582.58478    472.08281    291.50092    269.24506    220.66235 
+#> M_Knt6_Base8 
+#>    155.83254
 cd4.best$best.model$variance
 #>    Intercept V_Knt3_Base1 V_Knt3_Base2 V_Knt3_Base3 V_Knt3_Base4 V_Knt3_Base5 
 #>   40801.4581  411830.6370  109290.5901    2784.9777     914.4245  -25616.3670
@@ -319,7 +319,7 @@ plotVarReg(cd4.best$best.model,
            ylab = "CD4 cell count")
 ```
 
-![plot of chunk plotvarreg2](varregfig-plotvarreg2-1.png)
+![plotVarReg example of best model from search VarReg](figure/plotvarreg2-1.png)
 
 From these residuals, there still appears to be deviations from
 normality in the residuals, again seen in both the Q-Q plot and the
@@ -459,7 +459,7 @@ abline(0,1)
 mtext('C', side=3, line=2, at=0, adj=3)
 ```
 
-![plot of chunk resp](varregfig-resp-1.png)
+![Comparison of residuals](figure/resp-1.png)
 
 
 ## Viral load dataset (censored outcome data)
@@ -484,7 +484,7 @@ ggplot(rna, aes(x=x, y=y))+
   theme_minimal()
 ```
 
-![plot of chunk viralp](varregfig-viralp-1.png)
+![Viral load data demonstrating measurement error](figure/viralp-1.png)
 
 Now let us search for the optimal knots, using the censoring indicator and
 
