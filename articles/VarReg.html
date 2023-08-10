@@ -41,6 +41,12 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/under_the_hood.html">VarReg: Under the hood</a>
+  </div>
+</li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
@@ -117,7 +123,8 @@ demonstrating heteroscedasticity.</p>
 <span>  <span class="fu">ylab</span><span class="op">(</span><span class="st">"CD4 cell count"</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="varregfig-cd4p1-1.png" alt=""><p class="caption">plot of chunk cd4p1</p>
+<img src="cd4p1-1.png" alt=""><p class="caption">CD4 dataset: more variation in the CD4 counts at
+younger ages than at older ages</p>
 </div>
 <div class="section level3">
 <h3 id="linear-model-in-mean-and-variance">Linear model in mean and variance<a class="anchor" aria-label="anchor" href="#linear-model-in-mean-and-variance"></a>
@@ -150,7 +157,7 @@ demonstrating heteroscedasticity.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotVarReg.html">plotVarReg</a></span><span class="op">(</span><span class="va">cd4.linear</span>, xlab <span class="op">=</span> <span class="st">"Age in years"</span>, ylab <span class="op">=</span> <span class="st">"CD4 cell count"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="varregfig-plotcd4-1.png" alt=""><p class="caption">plot of chunk plotcd4</p>
+<img src="plotcd4-1.png" alt=""><p class="caption">PlotVarReg example</p>
 </div>
 </div>
 <div class="section level3">
@@ -601,10 +608,10 @@ key estimates from the best model are:</p>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span></span>
 <span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">mean</span></span>
-<span><span class="co">#&gt;    Intercept M_Knt6_Base1 M_Knt6_Base2 M_Knt6_Base3 M_Knt6_Base4 M_Knt6_Base5 M_Knt6_Base6 </span></span>
-<span><span class="co">#&gt;     32.98833   1597.06078    713.32197    582.58478    472.08281    291.50092    269.24506 </span></span>
-<span><span class="co">#&gt; M_Knt6_Base7 M_Knt6_Base8 </span></span>
-<span><span class="co">#&gt;    220.66235    155.83254</span></span>
+<span><span class="co">#&gt;    Intercept M_Knt6_Base1 M_Knt6_Base2 M_Knt6_Base3 M_Knt6_Base4 M_Knt6_Base5 M_Knt6_Base6 M_Knt6_Base7 </span></span>
+<span><span class="co">#&gt;     32.98833   1597.06078    713.32197    582.58478    472.08281    291.50092    269.24506    220.66235 </span></span>
+<span><span class="co">#&gt; M_Knt6_Base8 </span></span>
+<span><span class="co">#&gt;    155.83254</span></span>
 <span><span class="va">cd4.best</span><span class="op">$</span><span class="va">best.model</span><span class="op">$</span><span class="va">variance</span></span>
 <span><span class="co">#&gt;    Intercept V_Knt3_Base1 V_Knt3_Base2 V_Knt3_Base3 V_Knt3_Base4 V_Knt3_Base5 </span></span>
 <span><span class="co">#&gt;   40801.4581  411830.6370  109290.5901    2784.9777     914.4245  -25616.3670</span></span></code></pre></div>
@@ -615,7 +622,8 @@ given. We can then plot this best model:</p>
 <span>           xlab <span class="op">=</span> <span class="st">"Age in years"</span>,</span>
 <span>           ylab <span class="op">=</span> <span class="st">"CD4 cell count"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="varregfig-plotvarreg2-1.png" alt=""><p class="caption">plot of chunk plotvarreg2</p>
+<img src="plotvarreg2-1.png" alt=""><p class="caption">plotVarReg example of best model from search
+VarReg</p>
 </div>
 <p>From these residuals, there still appears to be deviations from
 normality in the residuals, again seen in both the Q-Q plot and the
@@ -762,7 +770,7 @@ Linear shape
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">'C'</span>, side<span class="op">=</span><span class="fl">3</span>, line<span class="op">=</span><span class="fl">2</span>, at<span class="op">=</span><span class="fl">0</span>, adj<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="varregfig-resp-1.png" alt=""><p class="caption">plot of chunk resp</p>
+<img src="resp-1.png" alt=""><p class="caption">Comparison of residuals</p>
 </div>
 </div>
 </div>
@@ -785,7 +793,7 @@ particular assay limit, in this case, 2.70.</p>
 <span>  <span class="fu">ylab</span><span class="op">(</span><span class="st">"Difference in viral load"</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="varregfig-viralp-1.png" alt=""><p class="caption">plot of chunk viralp</p>
+<img src="viralp-1.png" alt=""><p class="caption">Viral load data demonstrating measurement error</p>
 </div>
 <p>Now let us search for the optimal knots, using the censoring
 indicator and</p>
