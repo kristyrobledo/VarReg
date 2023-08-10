@@ -43,7 +43,7 @@ where $X_i=Y_i+Z_{i1}+...+Z_{iQ}$.
 In order to search the entire parameter space, a process of using sets of constrained EM algorithms are performed, an instance of a combinatorial EM (CEM) algorithm. Without loss of generality, assume that each covariate is scaled such that $x_{i} \in [0,1]$. Therefore, the constant term in the variance model ($\alpha_0$) will be the variance when all other variance parameters are zero. In order to search for non-positive slope, an EM algorithm is fit using the covariate $1-x_i$ in place of $x_i$, and thus the EM algorithm is maximising the log-likelihood over the parameter space estimates for $\alpha_0 \geq 0$ and $\alpha_q < 0$ for $q=1,2,...,Q$. By repeating this for all possible covariate combinations, we have a total of $2^Q$ EM algorithms in order to search the entire parameter space. The MLE will then be the $\hat{\boldsymbol{\theta}}$ from the EM algorithm that achieved the highest log-likelihood, where $\boldsymbol{\theta}$ is a vector of unknown parameters, $\boldsymbol{\theta} = (\boldsymbol{\beta},\boldsymbol{\alpha})$. These $2^Q$ models are referred to as the family of complete data models, and the general algorithm is again an instance of a CEM algorithm. Standard errors are obtained from the Fisher information matrix [@Robledo2021], or by bootstrapping. 
 
 <div class="figure" style="text-align: center">
-<img src="figure/ecmemean-1.png" alt="The ECME algorithm for the estimation of the mean and variance"  />
+<img src="ecmemean-1.png" alt="The ECME algorithm for the estimation of the mean and variance"  />
 <p class="caption">The ECME algorithm for the estimation of the mean and variance</p>
 </div>
 
@@ -195,7 +195,7 @@ A homoscedastic censored linear regression for $\dfrac{X_i}{\sigma(\boldsymbol{\
 This algorithm is an instance of the ECME algorithm, and is summarised schematically in Figure xx. As detailed in Section xxx and xxx, the algorithm maximises the log-likelihood over a restricted parameter space, and will need to be run multiple times in order to maximise over the full parameter space. Thus a total of $2^Q$ ECME algorithms must be run, once for each combination of the $q^{th}$ variance covariate taking the value $x_{i}$ or $1-x_{i}$, for $q=1,2,...,Q$. The log-likelihood is then maximised over the entire parameter space with this family of ECME algorithms. 
 
 <div class="figure" style="text-align: center">
-<img src="figure/ecmecensored-1.png" alt="The ECME algorithm for the estimation of the mean and variance with censored outcome data"  />
+<img src="ecmecensored-1.png" alt="The ECME algorithm for the estimation of the mean and variance with censored outcome data"  />
 <p class="caption">The ECME algorithm for the estimation of the mean and variance with censored outcome data</p>
 </div>
 
@@ -396,7 +396,7 @@ Once the current estimates for $\boldsymbol{\xi}$, $\boldsymbol{\omega^2}$ and $
 
 
 <div class="figure" style="text-align: center">
-<img src="figure/cyclicascent-1.png" alt="The cyclic coordinate ascent algorithm for the estimation of the location, scale and shape"  />
+<img src="cyclicascent-1.png" alt="The cyclic coordinate ascent algorithm for the estimation of the location, scale and shape"  />
 <p class="caption">The cyclic coordinate ascent algorithm for the estimation of the location, scale and shape</p>
 </div>
 

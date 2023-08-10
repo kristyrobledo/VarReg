@@ -11,6 +11,7 @@ LazyData: TRUE
 Suggests:
     knitr,
     rmarkdown,
+    bookdown,
     testthat
 Imports:
     splines,
